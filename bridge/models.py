@@ -1,9 +1,3 @@
-"""
-ZENEDGE PyTorch Model Cache
-
-Manages loading and caching PyTorch models for inference.
-"""
-
 import torch
 import torch.nn as nn
 from pathlib import Path

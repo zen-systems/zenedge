@@ -56,6 +56,13 @@ static void pci_check_device(uint8_t bus, uint8_t slot, uint8_t func) {
   console_write(" (Class ");
   print_hex32(class_code);
   console_write(")\n");
+
+  /* Identify specific known devices */
+  if (vendor == 0x10DE) {
+      console_write("[pci] ^-- NVIDIA GPU Detected");
+      if (device == 0x2484) console_write(" (RTX 3070)");
+      console_write("\n");
+  }
 }
 
 void pci_init(void) {

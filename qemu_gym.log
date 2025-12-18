@@ -1,0 +1,707 @@
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011B000
+[pmm] NUMA node 0: PFN 256-16496 (16213 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129812 KB (32453 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] initialized mesh table
+[ipc] joined mesh as Node 0
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=1
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[test] Got response! status=0x00008001 result_blob=0x00000000
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  1
+  Tail:  1
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  1
+  Tail:  1
+  Pending: 0 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 1 (writes: 1, irqs: 0)
+  RSP doorbell: 1 (writes: 1, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=2
+[test] Allocated tensor blob: id=3
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=4
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15234/15296 free
+[heap] Memory: 3968/978944 bytes used
+[heap] Blobs: 4 allocated
+  [1] type=1 size=3172 blocks=51
+  [2] type=0 size=128 blocks=3
+  [3] type=1 size=100 blocks=3
+  [4] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 2
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15237/15296 free
+[heap] Memory: 3776/978944 bytes used
+[heap] Blobs: 3 allocated
+  [1] type=1 size=3172 blocks=51
+  [4] type=1 size=228 blocks=5
+  [3] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64848 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=5752us (Server=2096612148us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 16467us (limit: 1666us)
+[sched] simulating non-compute step 1
+[sched] BUDGET EXCEED: step 1 took 4080us (limit: 1666us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2900us (Server=2096618669us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 2 took 12710us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 33257us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 2 state: OK -> WARNED
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=8/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=5591us (Server=2096632631us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 15349us (limit: 1500us)
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3406us (Server=2096636979us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 1 took 13114us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 28463us CPU, 2 violations
+
+--- Demo 3: Distributed Pipeline (Host Acceleration) ---
+[demo] Creating multi-stage neural network job...
+[contracts] applying contract for job 3
+[contracts] priority=HIGH, node=1, cpu_budget=100000us, mem_budget=1024KB
+[demo] Submitting pipeline job to scheduler...
+[sched] run_job begin (budget: 100000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=4518us (Server=2096647794us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=5556us (Server=2096652126us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=6038us (Server=2096656513us, Transport=0us)
+[sched] Remote error status: 0x00008001
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 45553us CPU, 0 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+2010 | BOOT | 0 | 0 | -
+9031 | BOOT | 0 | 0 | 0x00007EC5
+12020 | BOOT | 0 | 0 | 0x0000C0DE
+314138 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+326960 | UNKNOWN | 100 | 8 | 0x00001388
+334333 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+344051 | UNKNOWN | 100 | 1 | 0x00000008
+356865 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+359780 | MEM_ALLOC | 1 | 0 | 0x00000001
+362206 | MEM_ALLOC | 1 | 0 | 0x00000001
+364616 | MEM_ALLOC | 1 | 0 | 0x00000001
+367019 | MEM_ALLOC | 1 | 0 | 0x00000001
+371856 | MEM_EXCEED | 1 | 0 | 0x00000014
+374570 | STATE_CHANGE | 1 | 0 | 0x00000001
+380263 | MEM_FREE | 1 | 0 | 0x00000001
+380317 | MEM_FREE | 1 | 0 | 0x00000001
+380342 | MEM_FREE | 1 | 0 | 0x00000001
+380383 | MEM_FREE | 1 | 0 | 0x00000001
+383021 | JOB_SUBMIT | 1 | 0 | 0x00000003
+383388 | STEP_START | 1 | 0 | -
+399914 | STEP_END | 1 | 0 | 16467us
+402916 | BUDGET_EXCEED | 1 | 0 | 0x00004053
+403374 | STEP_START | 1 | 1 | -
+407461 | STEP_END | 1 | 1 | 4080us
+409948 | BUDGET_EXCEED | 1 | 1 | 0x00000FF0
+410001 | STEP_START | 1 | 2 | -
+422719 | STEP_END | 1 | 2 | 12710us
+425278 | BUDGET_EXCEED | 1 | 2 | 0x000031A6
+427716 | JOB_COMPLETE | 1 | 0 | -
+440481 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+442970 | MEM_ALLOC | 2 | 1 | 0x00000001
+445353 | MEM_ALLOC | 2 | 1 | 0x00000001
+450095 | MEM_EXCEED | 2 | 0 | 0x0000000C
+452439 | STATE_CHANGE | 2 | 0 | 0x00000001
+454998 | MEM_FREE | 2 | 1 | 0x00000001
+455023 | MEM_FREE | 2 | 1 | 0x00000001
+457595 | JOB_SUBMIT | 2 | 0 | 0x00000002
+457604 | STEP_START | 2 | 0 | -
+472964 | STEP_END | 2 | 0 | 15349us
+475440 | BUDGET_EXCEED | 2 | 0 | 0x00003BF5
+475454 | STEP_START | 2 | 1 | -
+488576 | STEP_END | 2 | 1 | 13114us
+491043 | BUDGET_EXCEED | 2 | 1 | 0x0000333A
+493433 | JOB_COMPLETE | 2 | 0 | -
+508222 | CONTRACT_APPLY | 3 | 0 | 0x000186A0
+513157 | JOB_SUBMIT | 3 | 0 | 0x00000003
+513167 | STEP_START | 3 | 0 | -
+527519 | STEP_END | 3 | 0 | 14343us
+527682 | STEP_START | 3 | 1 | -
+543091 | STEP_END | 3 | 1 | 15401us
+543114 | STEP_START | 3 | 2 | -
+558931 | STEP_END | 3 | 2 | 15809us
+561223 | JOB_COMPLETE | 3 | 0 | -
+=== END DUMP (53 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+
+--- In-Kernel Inference Demo (Neural Kernel) ---
+[kern] Resetting environment...
+[ipc] response: status=0x00008000 cmd=0x00000100 result=0x00000007
+[kern] Response received.
+[kern] Reset OK. Init Blob: 7
+[kern] Starting Neural Control Loop (200 steps)...
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000008
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000009
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000000F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000010
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000011
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000012
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000013
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000014
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000015
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000016
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000017
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000018
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000019
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000001F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000020
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000021
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000022
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000023
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000024
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000025
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000026
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000027
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000028
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000029
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000002F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000030
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000031
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000032
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000033
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000034
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000035
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000036
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000037
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000038
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000039
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000003F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000040
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000041
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000042
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000043
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000044
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000045
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000046
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000047
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000048
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000049
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000004F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000050
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000051
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000052
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000053
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000054
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000055
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000056
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000057
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000058
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000059
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000005F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000060
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000061
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000062
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000063
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000064
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000065
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000066
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000067
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000068
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000069
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000006F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000070
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000071
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000072
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000073
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000074
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000075
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000076
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000077
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000078
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000079
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000007F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000080
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000081
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000082
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000083
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000084
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000085
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000086
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000087
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000088
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000089
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000008F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000090
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000091
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000092
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000093
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000094
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000095
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000096
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000097
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000098
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x00000099
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009A
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009B
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009C
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009D
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009E
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x0000009F
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A0
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A1
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A2
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A3
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A4
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A5
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A6
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A7
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A8
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000A9
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AA
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AB
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AC
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AD
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AE
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000AF
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B0
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B1
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B2
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B3
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B4
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B5
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B6
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B7
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B8
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000B9
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BA
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BB
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BC
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BD
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BE
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000BF
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C0
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C1
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C2
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C3
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C4
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C5
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C6
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C7
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C8
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000C9
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CA
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CB
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CC
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CD
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CE
+[kern] Warn: No model weights found (ID 0). Using Heuristic.
+[ipc] response: status=0x00008000 cmd=0x00000101 result=0x000000CF
+[kern] Inference Demo Completed.
+[kmain] Scheduler active. Idle loop.
+qemu-system-i386: terminating on signal 15 from pid 19290 (/bin/bash)

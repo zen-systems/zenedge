@@ -4,7 +4,7 @@
 # Uses clang on macOS with ld.lld for ELF output
 
 CC      = clang
-LD      = ld.lld
+LD      = ld
 AS      = clang
 
 # Cross-compile flags for i386 bare-metal
@@ -13,9 +13,9 @@ AS      = clang
 TARGET  = -target i386-unknown-none-elf
 CFLAGS  = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
           -fno-builtin -fno-stack-protector -mno-red-zone -m32 \
-          -mno-sse -mno-sse2 -mno-mmx -mno-80387
+          -fno-builtin -fno-stack-protector -mno-red-zone -m32
 ASFLAGS = $(TARGET) -m32
-LDFLAGS = -T linker.ld -nostdlib
+LDFLAGS = -T linker.ld -nostdlib -m elf_i386
 
 # Kernel sources
 SOURCES = kernel/kmain.c \
@@ -39,7 +39,8 @@ SOURCES = kernel/kmain.c \
     kernel/shell.c \
     kernel/ipc/ipc.c \
     kernel/ipc/heap.c \
-    kernel/lib/divdi3.c
+    kernel/lib/divdi3.c \
+    kernel/lib/math.c
 
 SRC_S = \
     boot/multiboot_header.s \

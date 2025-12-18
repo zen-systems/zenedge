@@ -9,6 +9,29 @@ static uint32_t ivshmem_size = 0;
 static void *ivshmem_virt_base = 0;
 static uint8_t ivshmem_irq = 0;
 
+#include "../arch/idt.h"
+#include "../arch/pic.h"
+
+static ivshmem_irq_callback_t ivshmem_callback = 0;
+
+/* IRQ Handler wrapper */
+static void ivshmem_isr_handler(interrupt_frame_t *frame) {
+    (void)frame;
+    
+    // console_write("[ivshmem] IRQ!\n"); // Debug: too verbose?
+    
+    if (ivshmem_callback) {
+        ivshmem_callback();
+    }
+    
+    /* Acknowledge PIC */
+    pic_send_eoi(ivshmem_irq);
+}
+
+void ivshmem_set_callback(ivshmem_irq_callback_t cb) {
+    ivshmem_callback = cb;
+}
+
 void ivshmem_init(void) {
   pci_device_t dev;
   if (pci_find_device(IVSHMEM_VENDOR_ID, IVSHMEM_DEVICE_ID, &dev)) {
@@ -27,14 +50,21 @@ void ivshmem_init(void) {
     console_write("[ivshmem] IRQ: ");
     print_uint(ivshmem_irq);
     console_write("\n");
+    
+    /* Register ISR */
+    uint8_t vector = 32 + ivshmem_irq;
+    idt_register_handler(vector, ivshmem_isr_handler);
+    pic_unmask_irq(ivshmem_irq);
+    console_write("[ivshmem] ISR registered on vector ");
+    print_uint(vector);
+    console_write("\n");
 
-    /* BAR0 contains the MMIO region for the edu device.
-       We will treat this as our "Shared Memory" for IPC/Sidecar testing. */
+    /* BAR2 contains the shared memory region for ivshmem-plain devices. */
 
     uint32_t size_mask = 0;
-    uint32_t bar0 = pci_get_bar(dev, 0, &size_mask);
+    uint32_t bar2 = pci_get_bar(dev, 2, &size_mask);
 
-    ivshmem_phys_base = bar0;
+    ivshmem_phys_base = bar2;
     ivshmem_size = size_mask;
 
     console_write("[ivshmem] Shared Memory Phys: ");

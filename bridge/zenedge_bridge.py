@@ -203,7 +203,7 @@ class ZenedgeBridge:
 
         return packet
 
-    def send_response(self, status: int, orig_cmd: int, result: int = 0):
+    def send_response(self, status: int, orig_cmd: int, result: int = 0, duration_us: int = 0):
         """
         Send a response to ZENEDGE.
 
@@ -211,6 +211,7 @@ class ZenedgeBridge:
             status: Response status (RSP_OK, RSP_ERROR, etc.)
             orig_cmd: The command this is responding to
             result: Result value (e.g., blob_id for tensor results)
+            duration_us: Server-side execution duration in microseconds
         """
         header = self._read_rsp_ring_header()
 
@@ -229,7 +230,7 @@ class ZenedgeBridge:
             status=status,
             orig_cmd=orig_cmd,
             result=result,
-            timestamp=get_timestamp()
+            timestamp=duration_us if duration_us > 0 else get_timestamp()
         )
 
         # Write to ring at head position
@@ -254,12 +255,12 @@ class ZenedgeBridge:
         """
         self.handlers[cmd] = handler
 
-    def dispatch(self, packet: Packet) -> Tuple[int, int]:
+    def dispatch(self, packet: Packet) -> Tuple[int, int, int]:
         """
         Dispatch a packet to its handler.
 
         Returns:
-            (status, result) tuple
+            (status, result, duration_us) tuple
         """
         cmd_name = CMD_NAMES.get(packet.cmd, f"UNKNOWN({packet.cmd:#06x})")
         print(f"[BRIDGE] Received: {cmd_name} payload={packet.payload_id} "
@@ -267,15 +268,18 @@ class ZenedgeBridge:
 
         if packet.cmd in self.handlers:
             try:
+                t_start = time.time()
                 status, result = self.handlers[packet.cmd](self, packet)
-                return status, result
+                t_end = time.time()
+                duration_us = int((t_end - t_start) * 1_000_000)
+                return status, result, duration_us
             except Exception as e:
                 print(f"[BRIDGE] Handler error for {cmd_name}: {e}")
                 self.stats['errors'] += 1
-                return RSP_ERROR, 0
+                return RSP_ERROR, 0, 0
         else:
             print(f"[BRIDGE] No handler for {cmd_name}")
-            return RSP_ERROR, 0
+            return RSP_ERROR, 0, 0
 
     def run(self, poll_interval: float = 0.001):
         """
@@ -295,8 +299,8 @@ class ZenedgeBridge:
                 packet = self.poll_command()
 
                 if packet is not None:
-                    status, result = self.dispatch(packet)
-                    self.send_response(status, packet.cmd, result)
+                    status, result, duration_us = self.dispatch(packet)
+                    self.send_response(status, packet.cmd, result, duration_us)
                 else:
                     time.sleep(poll_interval)
 
@@ -315,8 +319,8 @@ class ZenedgeBridge:
         """
         packet = self.poll_command()
         if packet is not None:
-            status, result = self.dispatch(packet)
-            self.send_response(status, packet.cmd, result)
+            status, result, duration_us = self.dispatch(packet)
+            self.send_response(status, packet.cmd, result, duration_us)
             return True
         return False
 

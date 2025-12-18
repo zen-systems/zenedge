@@ -1,0 +1,458 @@
+[BRIDGE] Mapped shared memory: /dev/shm/zenedge_test (1048576 bytes)
+[MODELS] Initialized with device: cuda
+[MODELS] Model directory: /home/dj/zenedge/zenedge/models
+[BRIDGE] Command ring: magic=0x00000000, head=0, tail=0, size=0
+[BRIDGE] Response ring: magic=0x00000000, head=0, tail=0, size=0
+[BRIDGE] Doorbell magic: 0x00000000
+[BRIDGE] WARNING: Command ring not initialized (expected 0x51deca9e)
+[BRIDGE] WARNING: Response ring not initialized (expected 0x52535030)
+[BRIDGE] WARNING: Doorbell not initialized (expected 0x444f4f52)
+[HANDLERS] Registered handlers:
+  CMD_PING (0x0001)
+  CMD_PRINT (0x0002)
+  CMD_RUN_MODEL (0x0010)
+  CMD_TENSOR_ALLOC (0x0020)
+  CMD_TENSOR_FREE (0x0021)
+  CMD_HEAP_STATS (0x0022)
+  CMD_MODEL_LOAD (0x0030)
+[BRIDGE] Starting main loop (Ctrl+C to stop)
+[BRIDGE] Poll interval: 1.0ms
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[MODELS] Model 'default' not found, creating default
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 3: 2 blocks at offset 0xd40
+[HANDLER] RUN_MODEL: result in blob 3
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=10 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 12: 2 blocks at offset 0xdc0
+[HANDLER] RUN_MODEL: result in blob 12
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 13: 2 blocks at offset 0xf40
+[HANDLER] RUN_MODEL: result in blob 13
+[BRIDGE] Received: RUN_MODEL payload=10 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 14: 2 blocks at offset 0x2cc0
+[HANDLER] RUN_MODEL: result in blob 14
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 15: 2 blocks at offset 0x2d40
+[HANDLER] RUN_MODEL: result in blob 15
+[BRIDGE] Received: RUN_MODEL payload=10 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 16: 2 blocks at offset 0x2dc0
+[HANDLER] RUN_MODEL: result in blob 16
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 17: 2 blocks at offset 0x2e40
+[HANDLER] RUN_MODEL: result in blob 17
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=3 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 4: 2 blocks at offset 0x1a00
+[HANDLER] RUN_MODEL: result in blob 4
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 12: 2 blocks at offset 0x1a80
+[HANDLER] RUN_MODEL: result in blob 12
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 13: 2 blocks at offset 0x1b00
+[HANDLER] RUN_MODEL: result in blob 13
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 14: 2 blocks at offset 0x1b80
+[HANDLER] RUN_MODEL: result in blob 14
+[BRIDGE] Received: RUN_MODEL payload=15 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=15 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=15 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=9 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 10: 2 blocks at offset 0xd40
+[HANDLER] RUN_MODEL: result in blob 10
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=9 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 11: 2 blocks at offset 0x1ec0
+[HANDLER] RUN_MODEL: result in blob 11
+[BRIDGE] Received: RUN_MODEL payload=9 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 784), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 13: 2 blocks at offset 0x2c00
+[HANDLER] RUN_MODEL: result in blob 13
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 10), dtype=float32
+[HANDLER] RUN_MODEL error: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (1x10 and 784x128)
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 3: 2 blocks at offset 0x1980
+[HANDLER] RUN_MODEL: result in blob 3
+[BRIDGE] Received: RUN_MODEL payload=2 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 4: 2 blocks at offset 0x1a00
+[HANDLER] RUN_MODEL: result in blob 4
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(8, 8, 3), dtype=uint8
+[HANDLER] RUN_MODEL error: mat1 and mat2 must have the same dtype, but got Byte and Float
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 must have the same dtype, but got Byte and Float
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(8, 8, 3), dtype=uint8
+[HANDLER] RUN_MODEL error: mat1 and mat2 must have the same dtype, but got Byte and Float
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 must have the same dtype, but got Byte and Float
+[BRIDGE] Received: RUN_MODEL payload=11 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(8, 8, 3), dtype=uint8
+[HANDLER] RUN_MODEL error: mat1 and mat2 must have the same dtype, but got Byte and Float
+Traceback (most recent call last):
+  File "/home/dj/zenedge/zenedge/bridge/handlers.py", line 100, in handle_run_model
+    result = model(torch_input)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dj/.local/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 must have the same dtype, but got Byte and Float
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HEAP] Blob 12 is not a tensor (type=0)
+[HANDLER] RUN_MODEL: tensor 12 not found
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HEAP] Blob 12 is not a tensor (type=0)
+[HANDLER] RUN_MODEL: tensor 12 not found
+[BRIDGE] Received: RUN_MODEL payload=12 flags=0x0000
+[HEAP] Blob 12 is not a tensor (type=0)
+[HANDLER] RUN_MODEL: tensor 12 not found
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=6 flags=0x0000
+[HEAP] Invalid blob magic for blob 6
+[HANDLER] RUN_MODEL: tensor 6 not found
+[BRIDGE] Received: RUN_MODEL payload=6 flags=0x0000
+[HEAP] Invalid blob magic for blob 6
+[HANDLER] RUN_MODEL: tensor 6 not found
+[BRIDGE] Received: RUN_MODEL payload=6 flags=0x0000
+[HEAP] Invalid blob magic for blob 6
+[HANDLER] RUN_MODEL: tensor 6 not found
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[HANDLER] RUN_MODEL: input shape=(1, 28, 28), dtype=float32
+[HANDLER] RUN_MODEL: output shape=(1, 10), dtype=float32
+[HEAP] Allocated blob 2: 2 blocks at offset 0xcc0
+[HANDLER] RUN_MODEL: result in blob 2
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[HANDLER] RUN_MODEL: no input tensor

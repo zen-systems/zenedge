@@ -51,12 +51,16 @@ RING_HEADER_SIZE = 32  # 4 uint32 + 4 reserved uint32
 CMD_PING      = 0x0001
 CMD_PRINT     = 0x0002
 CMD_RUN_MODEL = 0x0010
+CMD_ENV_RESET = 0x0100
+CMD_ENV_STEP  = 0x0101
 
 # Command names for logging
 CMD_NAMES = {
     CMD_PING: "PING",
     CMD_PRINT: "PRINT",
     CMD_RUN_MODEL: "RUN_MODEL",
+    CMD_ENV_RESET: "ENV_RESET",
+    CMD_ENV_STEP: "ENV_STEP",
 }
 
 # =============================================================================

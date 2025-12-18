@@ -7,27 +7,111 @@
 #include "../process.h"
 #include "../time/time.h"
 #include "../trace/flightrec.h"
+#include "../ipc/ipc.h"
+#include "../ipc/ipc_proto.h"
+#include "../drivers/ivshmem.h"
+#include "../arch/pit.h"
 
 /* Helper to print uint in sched */
 /* Now using global console helpers print_uint and print_hex32 */
 
-static void simulate_step_execution(const job_step_t *s,
-                                    const task_contract_t *c) {
-  (void)c;
-  console_write("[sched] executing step ");
-  /* naive printing */
-  char ch = '0' + (char)(s->id % 10);
-  console_putc(ch);
-  console_putc('\n');
+static volatile int ipc_irq_received = 0;
 
-  /* Simulate work proportional to step type */
-  uint32_t iterations = 500000;
-  if (s->type == STEP_TYPE_COLLECTIVE) {
-    iterations = 1500000; /* Collectives take longer */
+static void sched_ipc_callback(void) {
+    ipc_irq_received = 1;
+}
+
+static void execute_step(const job_step_t *s, const task_contract_t *c) {
+  (void)c;
+
+  /* For non-compute steps, simulation is fine for now */
+  /* In a real system, COLLECTIVE would also use IPC/Fabric */
+  if (s->type != STEP_TYPE_COMPUTE) {
+      console_write("[sched] simulating non-compute step ");
+      print_uint(s->id);
+      console_write("\n");
+      for (volatile uint32_t i = 0; i < 100000; i++) { }
+      return;
   }
 
-  for (volatile uint32_t i = 0; i < iterations; i++) {
-    /* busy loop */
+  console_write("[sched] Offloading COMPUTE step ");
+  print_uint(s->id);
+  console_write(" to Bridge...\n");
+
+  /* Identify input tensor (use first input as payload) */
+  uint32_t payload_id = 0;
+  if (s->num_inputs > 0) {
+      payload_id = s->inputs[0];
+  }
+
+  /* Send IPC Command */
+  cycles_t start_cycles = rdtsc();
+  
+  if (ipc_send(CMD_RUN_MODEL, payload_id) != 0) {
+      console_write("[sched] Failed to send IPC command (Ring full?)\n");
+      return;
+  }
+
+  /* Poll for Completion (Adaptive Polling) */
+  /* Strategy: Spin for 2ms (covering most fast inferences), then sleep. */
+  
+  ipc_response_t rsp;
+  cycles_t wait_start = rdtsc();
+  int timeout_ms = 5000;
+  int received = 0;
+  
+  while (timeout_ms > 0) {
+      if (ipc_poll_response(&rsp)) {
+          received = 1;
+          break;
+      }
+      
+      /* Check how long we've been waiting in this cycle */
+      usec_t elapsed = cycles_to_usec(rdtsc() - wait_start);
+      
+      /* Increase spin threshold to handle TSC calibration skew.
+       * 100000us assumed might be only 25ms real time if CPU is fast.
+       */
+      if (elapsed < 100000) {
+          /* Busy wait / Relax */
+          __asm__ __volatile__("pause");
+      } else {
+          /* We've spun for 2ms, switch to sleep to save CPU */
+          pit_sleep_ms(1);
+          timeout_ms--; 
+          /* Reset spin counter? No, just sleep from now on?
+           * Actually, for a single step, if it takes >2ms, we can just sleep.
+           * But to be robust, we just keep sleeping after the initial spin period expired.
+           */
+      }
+  }
+
+  if (received) {
+      cycles_t end_cycles = rdtsc();
+      usec_t total_rtt_us = cycles_to_usec(end_cycles - start_cycles);
+      usec_t server_us = (usec_t)rsp.timestamp; /* Repurposed for duration */
+      usec_t transport_us = (total_rtt_us > server_us) ? (total_rtt_us - server_us) : 0;
+
+      console_write("[sched] Step complete. Result: ");
+      print_hex32(rsp.result);
+      console_write("\n");
+      
+      console_write("[sched] Latency Breakdown: Total=");
+      print_uint((uint32_t)total_rtt_us);
+      console_write("us (Server=");
+      print_uint((uint32_t)server_us);
+      console_write("us, Transport=");
+      print_uint((uint32_t)transport_us);
+      console_write("us)\n");
+
+      /* Optional: Validation of result? */
+      if (rsp.status != RSP_OK) {
+           console_write("[sched] Remote error status: ");
+           print_hex32(rsp.status);
+           console_write("\n");
+      }
+  } else {
+      console_write("[sched] TIMEOUT waiting for remote execution!\n");
   }
 }
 
@@ -69,7 +153,7 @@ void sched_run_job(sched_job_ctx_t *ctx) {
     trace_span_t span =
         flightrec_begin_span(TRACE_EVT_STEP_START, ctx->job->id, (uint32_t)sid);
 
-    simulate_step_execution(step, &ctx->contract);
+    execute_step(step, &ctx->contract);
 
     /* End span - this logs STEP_END with duration in 'extra' field */
     flightrec_end_span(span, TRACE_EVT_STEP_END);
@@ -298,6 +382,13 @@ void sched_test_rr(void) {
    *   B8 02 00 00 00       mov eax, 2
    *   CD 80                int 0x80
    *   EB EB                jmp start (-21 bytes? need to calculate jump)
+   */
+  /* 4. Copy "shellcode" to user memory
+   * We want to do:
+   *   while(1) {
+   *     sys_log("Hello User!"); // eax=1, ebx=msg
+   *     sys_yield();            // eax=2
+   *   }
    */
   uint8_t *code_ptr = (uint8_t *)phys_to_virt(code_phys);
 

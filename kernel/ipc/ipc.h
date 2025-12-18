@@ -38,4 +38,8 @@ void ipc_consume_one(void);
 /* Dump debug stats to console */
 void ipc_dump_debug(void);
 
+void ipc_mesh_init(void);
+void ipc_mesh_update(void);
+void ipc_mesh_dump(void);
+
 #endif /* _IPC_H */

@@ -114,12 +114,17 @@ void vmm_switch_pd(paddr_t pd_phys) {
  * Map a single page
  * Allocates a page table if needed
  */
+/*
+ * Map a single page
+ * Allocates a page table if needed
+ */
 int vmm_map_page(vaddr_t vaddr, paddr_t paddr, uint32_t flags) {
     uint32_t pde_idx = PDE_INDEX(vaddr);
     uint32_t pte_idx = PTE_INDEX(vaddr);
 
-    /* Get current page directory (virtual address) */
-    page_directory_t *pd = (page_directory_t *)phys_to_virt(current_pd_phys);
+    /* Get current page directory from HW to ensure we use the active one */
+    paddr_t active_pd_phys = read_cr3() & 0xFFFFF000;
+    page_directory_t *pd = (page_directory_t *)phys_to_virt(active_pd_phys);
 
     /* Check if page table exists */
     if (!(pd->entries[pde_idx] & PTE_PRESENT)) {
@@ -186,7 +191,8 @@ paddr_t vmm_unmap_page(vaddr_t vaddr) {
     uint32_t pde_idx = PDE_INDEX(vaddr);
     uint32_t pte_idx = PTE_INDEX(vaddr);
 
-    page_directory_t *pd = (page_directory_t *)phys_to_virt(current_pd_phys);
+    paddr_t active_pd_phys = read_cr3() & 0xFFFFF000;
+    page_directory_t *pd = (page_directory_t *)phys_to_virt(active_pd_phys);
 
     if (!(pd->entries[pde_idx] & PTE_PRESENT)) {
         return 0;  /* Page table doesn't exist */
@@ -210,7 +216,8 @@ paddr_t vmm_virt_to_phys(vaddr_t vaddr) {
     uint32_t pde_idx = PDE_INDEX(vaddr);
     uint32_t pte_idx = PTE_INDEX(vaddr);
 
-    page_directory_t *pd = (page_directory_t *)phys_to_virt(current_pd_phys);
+    paddr_t active_pd_phys = read_cr3() & 0xFFFFF000;
+    page_directory_t *pd = (page_directory_t *)phys_to_virt(active_pd_phys);
 
     if (!(pd->entries[pde_idx] & PTE_PRESENT)) {
         return 0;

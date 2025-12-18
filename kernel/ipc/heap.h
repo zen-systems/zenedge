@@ -62,4 +62,10 @@ uint16_t heap_alloc_tensor(uint8_t dtype, uint8_t ndim, const uint32_t *shape);
  */
 void *heap_get_tensor_data(uint16_t blob_id);
 
+/* Get physical address of a blob's data (for mapping to user space) */
+uint32_t heap_get_blob_phys(uint16_t blob_id);
+
+/* Get size of a blob's data */
+uint32_t heap_get_blob_size(uint16_t blob_id);
+
 #endif /* _IPC_HEAP_H */

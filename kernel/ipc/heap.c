@@ -80,9 +80,8 @@ void heap_init(void *heap_base) {
     return;
 
   heap_ctl = (heap_ctl_t *)heap_base;
-  /* Data starts after the control block + padding/alignment?
-     Using fixed offset 0x1000 relative to base as per consistent plan. */
-  heap_data = (uint8_t *)heap_base + 0x1000;
+  /* Data starts relative to control block */
+  heap_data = (uint8_t *)heap_base + (IPC_HEAP_DATA_OFFSET - IPC_HEAP_CTL_OFFSET);
 
   console_write("[heap] initializing shared heap at ");
   print_hex32((uint32_t)heap_ctl);
@@ -195,14 +194,52 @@ heap_blob_t *heap_get_blob(uint16_t blob_id) {
   if (!heap_ctl || blob_id == 0)
     return NULL;
 
+  /* 1. Check Cache */
   for (uint32_t i = 0; i < blob_count; i++) {
     if (blob_table[i].blob_id == blob_id) {
       heap_blob_t *blob = (heap_blob_t *)(heap_data + blob_table[i].offset);
+      /* Verify it's still there (might have been freed remotely) */
       if (blob->magic == BLOB_MAGIC && blob->blob_id == blob_id) {
         return blob;
       }
     }
   }
+
+  /* 2. Scan Heap (Slow Path for Remote/First Access) */
+  /* Iterate all blocks to find the blob header */
+  /* Optimization: Current max alloc? For now, scan all. */
+  
+  /* console_write("[heap] Blob not in cache, scanning...\n"); */
+  
+  for (uint32_t offset = 0; offset < IPC_HEAP_DATA_SIZE; offset += HEAP_BLOCK_SIZE) {
+      heap_blob_t *blob = (heap_blob_t *)(heap_data + offset);
+      if (blob->magic == BLOB_MAGIC) {
+          /* Found a valid blob */
+          if (blob->blob_id == blob_id) {
+              /* Add to cache */
+              if (blob_count < MAX_BLOBS) {
+                  blob_table[blob_count].blob_id = blob_id;
+                  blob_table[blob_count].offset = offset;
+                  /* Blocks = (size + hdr + block_size - 1) / block_size */
+                  uint32_t total = blob->size + sizeof(heap_blob_t);
+                  blob_table[blob_count].blocks = (total + HEAP_BLOCK_SIZE - 1) / HEAP_BLOCK_SIZE;
+                  blob_count++;
+              }
+              return blob;
+          }
+          
+          /* Skip ahead? blob->size is set.
+           * We can jump, but need to be careful of alignment/padding.
+           * Let's check size to jump faster.
+           */
+           uint32_t total = blob->size + sizeof(heap_blob_t);
+           uint32_t blocks = (total + HEAP_BLOCK_SIZE - 1) / HEAP_BLOCK_SIZE;
+           if (blocks > 1) {
+               offset += (blocks - 1) * HEAP_BLOCK_SIZE;
+           }
+      }
+  }
+
   return NULL;
 }
 
@@ -361,4 +398,28 @@ void *heap_get_tensor_data(uint16_t blob_id) {
 
   /* Skip tensor header */
   return (uint8_t *)data + sizeof(tensor_header_t);
+}
+
+/* Helper: get physical address of a blob */
+/* Note: We need to know the physical base of the heap.
+ * ivshmem_phys_base is static in drivers/ivshmem.c.
+ * But heap.c doesn't know it directly.
+ * We can assume heap_init was passed something mapped 1:1 or we need to pass phys base.
+ * Actually, vmm_init mapped SHARED_MEM_PHYS to SHARED_MEM_VIRT.
+ * So we can translate.
+ */
+#include "../mm/vmm.h"
+
+uint32_t heap_get_blob_phys(uint16_t blob_id) {
+    heap_blob_t *blob = heap_get_blob(blob_id);
+    if (!blob) return 0;
+    
+    void *vaddr = (void*)(heap_data + blob->offset);
+    return vmm_virt_to_phys((uint32_t)vaddr);
+}
+
+uint32_t heap_get_blob_size(uint16_t blob_id) {
+    heap_blob_t *blob = heap_get_blob(blob_id);
+    if (!blob) return 0;
+    return blob->size;
 }

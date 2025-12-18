@@ -1,0 +1,1420 @@
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011A000
+[pmm] NUMA node 0: PFN 256-16496 (16214 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129816 KB (32454 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] initialized mesh table
+[ipc] joined mesh as Node 0
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=1
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000003
+[test] Got response! status=0x00008000 result_blob=0x00000003
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  2
+  Tail:  2
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  2
+  Tail:  2
+  Pending: 0 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 2 (writes: 1, irqs: 0)
+  RSP doorbell: 2 (writes: 2, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=6
+[test] Allocated tensor blob: id=7
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=9
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15219/15296 free
+[heap] Memory: 4928/978944 bytes used
+[heap] Blobs: 4 allocated
+  [1] type=1 size=3172 blocks=51
+  [6] type=0 size=128 blocks=3
+  [7] type=1 size=100 blocks=3
+  [9] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 6
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15225/15296 free
+[heap] Memory: 4544/978944 bytes used
+[heap] Blobs: 3 allocated
+  [1] type=1 size=3172 blocks=51
+  [9] type=1 size=228 blocks=5
+  [7] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64852 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3783us (Server=8us, Transport=3775us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 14936us (limit: 1666us)
+[sched] simulating non-compute step 1
+[sched] BUDGET EXCEED: step 1 took 4220us (limit: 1666us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2684us (Server=4us, Transport=2680us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 2 took 12906us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 32062us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 2 state: OK -> WARNED
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=8/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2735us (Server=6us, Transport=2729us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 12877us (limit: 1500us)
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2672us (Server=3us, Transport=2669us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 1 took 12771us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 25648us CPU, 2 violations
+
+--- Demo 3: Distributed Pipeline (Host Acceleration) ---
+[demo] Creating multi-stage neural network job...
+[contracts] applying contract for job 3
+[contracts] priority=HIGH, node=1, cpu_budget=100000us, mem_budget=1024KB
+[demo] Submitting pipeline job to scheduler...
+[sched] run_job begin (budget: 100000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2714us (Server=10us, Transport=2704us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2739us (Server=5us, Transport=2734us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2680us (Server=8us, Transport=2672us)
+[sched] Remote error status: 0x00008001
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 38883us CPU, 0 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+1249 | BOOT | 0 | 0 | -
+8162 | BOOT | 0 | 0 | 0x00007EC6
+11232 | BOOT | 0 | 0 | 0x0000C0DE
+745899 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+759563 | UNKNOWN | 100 | 8 | 0x00001388
+767238 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+777429 | UNKNOWN | 100 | 1 | 0x00000008
+790179 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+793195 | MEM_ALLOC | 1 | 0 | 0x00000001
+795815 | MEM_ALLOC | 1 | 0 | 0x00000001
+798329 | MEM_ALLOC | 1 | 0 | 0x00000001
+800829 | MEM_ALLOC | 1 | 0 | 0x00000001
+805934 | MEM_EXCEED | 1 | 0 | 0x00000014
+808953 | STATE_CHANGE | 1 | 0 | 0x00000001
+815005 | MEM_FREE | 1 | 0 | 0x00000001
+815058 | MEM_FREE | 1 | 0 | 0x00000001
+815083 | MEM_FREE | 1 | 0 | 0x00000001
+815106 | MEM_FREE | 1 | 0 | 0x00000001
+818000 | JOB_SUBMIT | 1 | 0 | 0x00000003
+818418 | STEP_START | 1 | 0 | -
+833411 | STEP_END | 1 | 0 | 14936us
+836561 | BUDGET_EXCEED | 1 | 0 | 0x00003A58
+837027 | STEP_START | 1 | 1 | -
+841256 | STEP_END | 1 | 1 | 4220us
+843902 | BUDGET_EXCEED | 1 | 1 | 0x0000107C
+843960 | STEP_START | 1 | 2 | -
+856873 | STEP_END | 1 | 2 | 12906us
+859429 | BUDGET_EXCEED | 1 | 2 | 0x0000326A
+861909 | JOB_COMPLETE | 1 | 0 | -
+875273 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+877925 | MEM_ALLOC | 2 | 1 | 0x00000001
+880493 | MEM_ALLOC | 2 | 1 | 0x00000001
+885490 | MEM_EXCEED | 2 | 0 | 0x0000000C
+887963 | STATE_CHANGE | 2 | 0 | 0x00000001
+890777 | MEM_FREE | 2 | 1 | 0x00000001
+890807 | MEM_FREE | 2 | 1 | 0x00000001
+893345 | JOB_SUBMIT | 2 | 0 | 0x00000002
+893354 | STEP_START | 2 | 0 | -
+906239 | STEP_END | 2 | 0 | 12877us
+908877 | BUDGET_EXCEED | 2 | 0 | 0x0000324D
+908891 | STEP_START | 2 | 1 | -
+921669 | STEP_END | 2 | 1 | 12771us
+924254 | BUDGET_EXCEED | 2 | 1 | 0x000031E3
+926742 | JOB_COMPLETE | 2 | 0 | -
+942134 | CONTRACT_APPLY | 3 | 0 | 0x000186A0
+947141 | JOB_SUBMIT | 3 | 0 | 0x00000003
+947150 | STEP_START | 3 | 0 | -
+960112 | STEP_END | 3 | 0 | 12953us
+960263 | STEP_START | 3 | 1 | -
+973172 | STEP_END | 3 | 1 | 12899us
+973190 | STEP_START | 3 | 2 | -
+986230 | STEP_END | 3 | 2 | 13031us
+988587 | JOB_COMPLETE | 3 | 0 | -
+=== END DUMP (53 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+=== KERNEL MESH ===
+Node 0: (ME) ALIVE Load=0 Heartbeat=0x00000000
+===================
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011E000 (virt 0xC011E000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011A000
+[pmm] NUMA node 0: PFN 256-16496 (16214 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129816 KB (32454 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] initialized mesh table
+[ipc] joined mesh as Node 0
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=3
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000002
+[test] Got response! status=0x00008000 result_blob=0x00000002
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  2
+  Tail:  2
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  2
+  Tail:  1
+  Pending: 1 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 2 (writes: 2, irqs: 0)
+  RSP doorbell: 2 (writes: 2, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=6
+[test] Allocated tensor blob: id=8
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=10
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15168/15296 free
+[heap] Memory: 8192/978944 bytes used
+[heap] Blobs: 4 allocated
+  [3] type=1 size=3172 blocks=51
+  [6] type=0 size=128 blocks=3
+  [8] type=1 size=100 blocks=3
+  [10] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 6
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15174/15296 free
+[heap] Memory: 7808/978944 bytes used
+[heap] Blobs: 3 allocated
+  [3] type=1 size=3172 blocks=51
+  [10] type=1 size=228 blocks=5
+  [8] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64852 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000004
+[sched] Step complete. Result: 0x00000004
+[sched] Latency Breakdown: Total=3598us (Server=460us, Transport=3138us)
+[sched] BUDGET EXCEED: step 0 took 11986us (limit: 1666us)
+[sched] simulating non-compute step 1
+[sched] BUDGET EXCEED: step 1 took 4584us (limit: 1666us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2662us (Server=8us, Transport=2654us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 2 took 13481us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 30051us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 2 state: OK -> WARNED
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=8/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2568us (Server=10us, Transport=2558us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 13131us (limit: 1500us)
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2769us (Server=5us, Transport=2764us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 1 took 13087us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 26218us CPU, 2 violations
+
+--- Demo 3: Distributed Pipeline (Host Acceleration) ---
+[demo] Creating multi-stage neural network job...
+[contracts] applying contract for job 3
+[contracts] priority=HIGH, node=1, cpu_budget=100000us, mem_budget=1024KB
+[demo] Submitting pipeline job to scheduler...
+[sched] run_job begin (budget: 100000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2653us (Server=7us, Transport=2646us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x0000000C
+[sched] Step complete. Result: 0x0000000C
+[sched] Latency Breakdown: Total=2576us (Server=556us, Transport=2020us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x0000000D
+[sched] Step complete. Result: 0x0000000D
+[sched] Latency Breakdown: Total=2813us (Server=444us, Transport=2369us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 34389us CPU, 0 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+1324 | BOOT | 0 | 0 | -
+9369 | BOOT | 0 | 0 | 0x00007EC6
+12390 | BOOT | 0 | 0 | 0x0000C0DE
+312678 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+327010 | UNKNOWN | 100 | 8 | 0x00001388
+335198 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+345428 | UNKNOWN | 100 | 1 | 0x00000008
+359253 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+362234 | MEM_ALLOC | 1 | 0 | 0x00000001
+365524 | MEM_ALLOC | 1 | 0 | 0x00000001
+367976 | MEM_ALLOC | 1 | 0 | 0x00000001
+370383 | MEM_ALLOC | 1 | 0 | 0x00000001
+375405 | MEM_EXCEED | 1 | 0 | 0x00000014
+378851 | STATE_CHANGE | 1 | 0 | 0x00000001
+384668 | MEM_FREE | 1 | 0 | 0x00000001
+384722 | MEM_FREE | 1 | 0 | 0x00000001
+384748 | MEM_FREE | 1 | 0 | 0x00000001
+384771 | MEM_FREE | 1 | 0 | 0x00000001
+387587 | JOB_SUBMIT | 1 | 0 | 0x00000003
+387968 | STEP_START | 1 | 0 | -
+400014 | STEP_END | 1 | 0 | 11986us
+403141 | BUDGET_EXCEED | 1 | 0 | 0x00002ED2
+403627 | STEP_START | 1 | 1 | -
+408220 | STEP_END | 1 | 1 | 4584us
+411037 | BUDGET_EXCEED | 1 | 1 | 0x000011E8
+411102 | STEP_START | 1 | 2 | -
+424594 | STEP_END | 1 | 2 | 13481us
+427144 | BUDGET_EXCEED | 1 | 2 | 0x000034A9
+429583 | JOB_COMPLETE | 1 | 0 | -
+443356 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+445885 | MEM_ALLOC | 2 | 1 | 0x00000001
+448411 | MEM_ALLOC | 2 | 1 | 0x00000001
+453995 | MEM_EXCEED | 2 | 0 | 0x0000000C
+456390 | STATE_CHANGE | 2 | 0 | 0x00000001
+459088 | MEM_FREE | 2 | 1 | 0x00000001
+459117 | MEM_FREE | 2 | 1 | 0x00000001
+461700 | JOB_SUBMIT | 2 | 0 | 0x00000002
+461709 | STEP_START | 2 | 0 | -
+474849 | STEP_END | 2 | 0 | 13131us
+477440 | BUDGET_EXCEED | 2 | 0 | 0x0000334B
+477452 | STEP_START | 2 | 1 | -
+490547 | STEP_END | 2 | 1 | 13087us
+493134 | BUDGET_EXCEED | 2 | 1 | 0x0000331F
+495532 | JOB_COMPLETE | 2 | 0 | -
+511344 | CONTRACT_APPLY | 3 | 0 | 0x000186A0
+517055 | JOB_SUBMIT | 3 | 0 | 0x00000003
+517067 | STEP_START | 3 | 0 | -
+530431 | STEP_END | 3 | 0 | 13355us
+530588 | STEP_START | 3 | 1 | -
+540715 | STEP_END | 3 | 1 | 10121us
+540730 | STEP_START | 3 | 2 | -
+551651 | STEP_END | 3 | 2 | 10913us
+553969 | JOB_COMPLETE | 3 | 0 | -
+=== END DUMP (53 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+=== KERNEL MESH ===
+Node 0: (ME) ALIVE Load=0 Heartbeat=0x00000000
+===================
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011E000 (virt 0xC011E000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011A000
+[pmm] NUMA node 0: PFN 256-16496 (16214 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129816 KB (32454 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] initialized mesh table
+[ipc] joined mesh as Node 0
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=1
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000002
+[test] Got response! status=0x00008000 result_blob=0x00000002
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  1
+  Tail:  0
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  0
+  Tail:  0
+  Pending: 0 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 0 (writes: 0, irqs: 0)
+  RSP doorbell: 0 (writes: 0, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=3
+[test] Allocated tensor blob: id=4
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=5
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15232/15296 free
+[heap] Memory: 4096/978944 bytes used
+[heap] Blobs: 4 allocated
+  [1] type=1 size=3172 blocks=51
+  [3] type=0 size=128 blocks=3
+  [4] type=1 size=100 blocks=3
+  [5] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 3
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15235/15296 free
+[heap] Memory: 3904/978944 bytes used
+[heap] Blobs: 3 allocated
+  [1] type=1 size=3172 blocks=51
+  [5] type=1 size=228 blocks=5
+  [4] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64852 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3194us (Server=13us, Transport=3181us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 14759us (limit: 1666us)
+[sched] simulating non-compute step 1
+[sched] BUDGET EXCEED: step 1 took 4363us (limit: 1666us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=4554us (Server=7us, Transport=4547us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 2 took 15155us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 34277us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 2 state: OK -> WARNED
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=8/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3332us (Server=6us, Transport=3326us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 14092us (limit: 1500us)
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2602us (Server=5us, Transport=2597us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 1 took 13163us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 27255us CPU, 2 violations
+
+--- Demo 3: Distributed Pipeline (Host Acceleration) ---
+[demo] Creating multi-stage neural network job...
+[contracts] applying contract for job 3
+[contracts] priority=HIGH, node=1, cpu_budget=100000us, mem_budget=1024KB
+[demo] Submitting pipeline job to scheduler...
+[sched] run_job begin (budget: 100000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2597us (Server=8us, Transport=2589us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2639us (Server=4us, Transport=2635us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x0000000B
+[sched] Step complete. Result: 0x0000000B
+[sched] Latency Breakdown: Total=2680us (Server=472us, Transport=2208us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 36831us CPU, 0 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+1357 | BOOT | 0 | 0 | -
+9169 | BOOT | 0 | 0 | 0x00007EC6
+12173 | BOOT | 0 | 0 | 0x0000C0DE
+325518 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+339487 | UNKNOWN | 100 | 8 | 0x00001388
+347107 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+358076 | UNKNOWN | 100 | 1 | 0x00000008
+371132 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+374026 | MEM_ALLOC | 1 | 0 | 0x00000001
+376606 | MEM_ALLOC | 1 | 0 | 0x00000001
+379018 | MEM_ALLOC | 1 | 0 | 0x00000001
+381753 | MEM_ALLOC | 1 | 0 | 0x00000001
+387205 | MEM_EXCEED | 1 | 0 | 0x00000014
+389982 | STATE_CHANGE | 1 | 0 | 0x00000001
+395945 | MEM_FREE | 1 | 0 | 0x00000001
+396012 | MEM_FREE | 1 | 0 | 0x00000001
+396057 | MEM_FREE | 1 | 0 | 0x00000001
+396098 | MEM_FREE | 1 | 0 | 0x00000001
+399450 | JOB_SUBMIT | 1 | 0 | 0x00000003
+399835 | STEP_START | 1 | 0 | -
+414653 | STEP_END | 1 | 0 | 14759us
+417739 | BUDGET_EXCEED | 1 | 0 | 0x000039A7
+418206 | STEP_START | 1 | 1 | -
+422574 | STEP_END | 1 | 1 | 4363us
+425084 | BUDGET_EXCEED | 1 | 1 | 0x0000110B
+425137 | STEP_START | 1 | 2 | -
+440298 | STEP_END | 1 | 2 | 15155us
+443506 | BUDGET_EXCEED | 1 | 2 | 0x00003B33
+445956 | JOB_COMPLETE | 1 | 0 | -
+459801 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+462395 | MEM_ALLOC | 2 | 1 | 0x00000001
+464891 | MEM_ALLOC | 2 | 1 | 0x00000001
+469762 | MEM_EXCEED | 2 | 0 | 0x0000000C
+472789 | STATE_CHANGE | 2 | 0 | 0x00000001
+475455 | MEM_FREE | 2 | 1 | 0x00000001
+475482 | MEM_FREE | 2 | 1 | 0x00000001
+477965 | JOB_SUBMIT | 2 | 0 | 0x00000002
+477974 | STEP_START | 2 | 0 | -
+492073 | STEP_END | 2 | 0 | 14092us
+494659 | BUDGET_EXCEED | 2 | 0 | 0x0000370C
+494673 | STEP_START | 2 | 1 | -
+507841 | STEP_END | 2 | 1 | 13163us
+510422 | BUDGET_EXCEED | 2 | 1 | 0x0000336B
+512745 | JOB_COMPLETE | 2 | 0 | -
+528476 | CONTRACT_APPLY | 3 | 0 | 0x000186A0
+534165 | JOB_SUBMIT | 3 | 0 | 0x00000003
+534176 | STEP_START | 3 | 0 | -
+547291 | STEP_END | 3 | 0 | 13104us
+547491 | STEP_START | 3 | 1 | -
+560294 | STEP_END | 3 | 1 | 12797us
+560310 | STEP_START | 3 | 2 | -
+571248 | STEP_END | 3 | 2 | 10930us
+573565 | JOB_COMPLETE | 3 | 0 | -
+=== END DUMP (53 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+=== KERNEL MESH ===
+Node 0: (ME) ALIVE Load=0 Heartbeat=0x00000000
+===================
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011E000 (virt 0xC011E000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011A000
+[pmm] NUMA node 0: PFN 256-16496 (16214 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129816 KB (32454 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] joined mesh as Node 1
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=2
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000003
+[test] Got response! status=0x00008000 result_blob=0x00000003
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  2
+  Tail:  2
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  2
+  Tail:  1
+  Pending: 1 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 2 (writes: 2, irqs: 0)
+  RSP doorbell: 2 (writes: 2, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=7
+[test] Allocated tensor blob: id=8
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=10
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15168/15296 free
+[heap] Memory: 8192/978944 bytes used
+[heap] Blobs: 4 allocated
+  [2] type=1 size=3172 blocks=51
+  [7] type=0 size=128 blocks=3
+  [8] type=1 size=100 blocks=3
+  [10] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 7
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15174/15296 free
+[heap] Memory: 7808/978944 bytes used
+[heap] Blobs: 3 allocated
+  [2] type=1 size=3172 blocks=51
+  [10] type=1 size=228 blocks=5
+  [8] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64852 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2873us (Server=10us, Transport=2863us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 14240us (limit: 1666us)
+[sched] simulating non-compute step 1
+[sched] BUDGET EXCEED: step 1 took 4246us (limit: 1666us)
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=2704us (Server=8us, Transport=2696us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 2 took 13108us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 31594us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 2 state: OK -> WARNED
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=8/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3179us (Server=9us, Transport=3170us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 0 took 14867us (limit: 1500us)
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3289us (Server=10us, Transport=3279us)
+[sched] Remote error status: 0x00008001
+[sched] BUDGET EXCEED: step 1 took 15057us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 29924us CPU, 2 violations
+
+--- Demo 3: Distributed Pipeline (Host Acceleration) ---
+[demo] Creating multi-stage neural network job...
+[contracts] applying contract for job 3
+[contracts] priority=HIGH, node=1, cpu_budget=100000us, mem_budget=1024KB
+[demo] Submitting pipeline job to scheduler...
+[sched] run_job begin (budget: 100000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=4109us (Server=839us, Transport=3270us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 1 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3365us (Server=20us, Transport=3345us)
+[sched] Remote error status: 0x00008001
+[sched] Offloading COMPUTE step 2 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=3221us (Server=21us, Transport=3200us)
+[sched] Remote error status: 0x00008001
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 45721us CPU, 0 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+1384 | BOOT | 0 | 0 | -
+9011 | BOOT | 0 | 0 | 0x00007EC6
+12010 | BOOT | 0 | 0 | 0x0000C0DE
+322496 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+336184 | UNKNOWN | 100 | 8 | 0x00001388
+343902 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+354696 | UNKNOWN | 100 | 1 | 0x00000008
+367459 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+370505 | MEM_ALLOC | 1 | 0 | 0x00000001
+373083 | MEM_ALLOC | 1 | 0 | 0x00000001
+375657 | MEM_ALLOC | 1 | 0 | 0x00000001
+378143 | MEM_ALLOC | 1 | 0 | 0x00000001
+383360 | MEM_EXCEED | 1 | 0 | 0x00000014
+386402 | STATE_CHANGE | 1 | 0 | 0x00000001
+392773 | MEM_FREE | 1 | 0 | 0x00000001
+392826 | MEM_FREE | 1 | 0 | 0x00000001
+392851 | MEM_FREE | 1 | 0 | 0x00000001
+392874 | MEM_FREE | 1 | 0 | 0x00000001
+395774 | JOB_SUBMIT | 1 | 0 | 0x00000003
+396148 | STEP_START | 1 | 0 | -
+410446 | STEP_END | 1 | 0 | 14240us
+413689 | BUDGET_EXCEED | 1 | 0 | 0x000037A0
+414244 | STEP_START | 1 | 1 | -
+418496 | STEP_END | 1 | 1 | 4246us
+421150 | BUDGET_EXCEED | 1 | 1 | 0x00001096
+421205 | STEP_START | 1 | 2 | -
+434320 | STEP_END | 1 | 2 | 13108us
+436946 | BUDGET_EXCEED | 1 | 2 | 0x00003334
+439437 | JOB_COMPLETE | 1 | 0 | -
+453030 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+455697 | MEM_ALLOC | 2 | 1 | 0x00000001
+458313 | MEM_ALLOC | 2 | 1 | 0x00000001
+463274 | MEM_EXCEED | 2 | 0 | 0x0000000C
+465767 | STATE_CHANGE | 2 | 0 | 0x00000001
+468442 | MEM_FREE | 2 | 1 | 0x00000001
+468469 | MEM_FREE | 2 | 1 | 0x00000001
+471683 | JOB_SUBMIT | 2 | 0 | 0x00000002
+471697 | STEP_START | 2 | 0 | -
+486573 | STEP_END | 2 | 0 | 14867us
+489583 | BUDGET_EXCEED | 2 | 0 | 0x00003A13
+489599 | STEP_START | 2 | 1 | -
+504661 | STEP_END | 2 | 1 | 15057us
+507685 | BUDGET_EXCEED | 2 | 1 | 0x00003AD1
+510453 | JOB_COMPLETE | 2 | 0 | -
+528055 | CONTRACT_APPLY | 3 | 0 | 0x000186A0
+534192 | JOB_SUBMIT | 3 | 0 | 0x00000003
+534205 | STEP_START | 3 | 0 | -
+549917 | STEP_END | 3 | 0 | 15705us
+550049 | STEP_START | 3 | 1 | -
+565061 | STEP_END | 3 | 1 | 15005us
+565078 | STEP_START | 3 | 2 | -
+580096 | STEP_END | 3 | 2 | 15011us
+582729 | JOB_COMPLETE | 3 | 0 | -
+=== END DUMP (53 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+=== KERNEL MESH ===
+Node 0: ALIVE Load=0 Heartbeat=0x00000000
+Node 1: (ME) ALIVE Load=0 Heartbeat=0x00000000
+===================
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011E000 (virt 0xC011E000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00009500, flags=0x0000024F
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x0011A000
+[pmm] NUMA node 0: PFN 256-16496 (16214 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129816 KB (32454 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001AF4:0x00001110 at 0:4.0 (Class 0x00000005)
+[ivshmem] Found device at 0:4.0
+[ivshmem] IRQ: 0
+[ivshmem] ISR registered on vector 32
+[ivshmem] Shared Memory Phys: 0xFE000000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[ipc] cmd ring at 0xE0000000
+[ipc] rsp ring at 0xE0008000
+[ipc] doorbell at 0xE0010000
+[heap] initializing shared heap at 0xE0010100
+[heap] initialized: 956KB, 15296 blocks
+[ipc] Warning: Invalid IRQ, polling mode only.
+[ipc] initialized mesh table
+[ipc] joined mesh as Node 0
+
+--- IPC Inference Demo ---
+[test] Allocated input tensor: id=1
+[test] Sending CMD_RUN_MODEL...
+[test] Polling for response...
+[ipc] response: status=0x00008000 cmd=0x00000010 result=0x00000002
+[test] Got response! status=0x00008000 result_blob=0x00000002
+[ipc] === DEBUG DUMP ===
+[ipc] CMD Ring:
+  Magic: 0x51DECA9E (valid)
+  Head:  1
+  Tail:  1
+  Pending: 0 packets
+[ipc] RSP Ring:
+  Magic: 0x52535030 (valid)
+  Head:  1
+  Tail:  1
+  Pending: 0 responses
+[ipc] Doorbell:
+  Magic: 0x444F4F52 (valid)
+  CMD doorbell: 1 (writes: 1, irqs: 0)
+  RSP doorbell: 1 (writes: 1, irqs: 0)
+  RSP IRQ enabled: yes
+  Local IRQ count: 0
+[ipc] === END DUMP ===
+
+--- Shared Heap Demo ---
+[test] Allocated raw blob: id=4
+[test] Allocated tensor blob: id=6
+[test] Wrote 16 floats to tensor
+[test] Allocated image tensor: id=8
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15221/15296 free
+[heap] Memory: 4800/978944 bytes used
+[heap] Blobs: 4 allocated
+  [1] type=1 size=3172 blocks=51
+  [4] type=0 size=128 blocks=3
+  [6] type=1 size=100 blocks=3
+  [8] type=1 size=228 blocks=5
+[heap] === END DUMP ===
+[test] Freed blob 4
+[heap] === DEBUG DUMP ===
+[heap] Magic: 0x48454150 (valid)
+[heap] Blocks: 15227/15296 free
+[heap] Memory: 4416/978944 bytes used
+[heap] Blobs: 3 allocated
+  [1] type=1 size=3172 blocks=51
+  [8] type=1 size=228 blocks=5
+  [6] type=1 size=100 blocks=3
+[heap] === END DUMP ===
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64852 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] allocation denied: BUDGET EXCEEDED
+[contracts] job 1 state: OK -> WARNED
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=16/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] Offloading COMPUTE step 0 to Bridge...
+[ipc] response: status=0x00008001 cmd=0x00000010 result=0x00000000
+[sched] Step complete. Result: 0x00000000
+[sched] Latency Breakdown: Total=5203us (Server=7us, Transport=5196us)
+[sched] Remote error status: 0x00008001

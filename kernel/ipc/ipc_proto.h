@@ -83,6 +83,8 @@ typedef struct {
 #define CMD_PING      0x0001
 #define CMD_PRINT     0x0002
 #define CMD_RUN_MODEL 0x0010
+#define CMD_ENV_RESET 0x0100
+#define CMD_ENV_STEP  0x0101
 
 /* Response IDs (0x8000-0xFFFF) - high bit set indicates response */
 #define RSP_OK        0x8000
@@ -204,5 +206,39 @@ typedef struct {
 
 /* Helper: calculate bitmap size in bytes */
 #define HEAP_BITMAP_SIZE ((HEAP_MAX_BLOCKS + 7) / 8)
+
+/* =============================================================================
+ * KERNEL MESH PROTOCOL - Shared State & Discovery
+ * =============================================================================
+ * Offset 0x10800 (Between Doorbell and Heap Control)
+ */
+#define IPC_MESH_OFFSET      0x10800
+#define MES_MAX_NODES        8
+
+/* Node Status */
+#define NODE_STATUS_OFFLINE  0x00
+#define NODE_STATUS_ALIVE    0x01
+#define NODE_STATUS_BUSY     0x02
+
+/* Node Descriptor */
+typedef struct {
+  uint32_t node_id;         /* 0..MAX_NODES-1 */
+  uint32_t status;          /* NODE_STATUS_* */
+  uint32_t cpu_load;        /* 0..100% */
+  uint64_t heartbeat;       /* TSC / System Time */
+  uint64_t jobs_completed;  /* Stats */
+  uint32_t reserved[4];     /* Padding */
+} mesh_node_t;
+
+/* Mesh Table (Shared Memory) */
+typedef struct {
+  uint32_t magic;           /* 0x4D455348 "MESH" */
+  uint32_t version;         /* 1 */
+  uint32_t active_nodes;    /* Count of alive nodes */
+  uint32_t reserved[5];
+  mesh_node_t nodes[MES_MAX_NODES];
+} mesh_table_t;
+
+#define MESH_MAGIC 0x4D455348 /* "MESH" */
 
 #endif /* _IPC_PROTO_H */

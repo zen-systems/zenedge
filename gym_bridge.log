@@ -1,0 +1,440 @@
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+[BRIDGE] Mapped shared memory: /dev/shm/zenedge_test (1048576 bytes)
+[MODELS] Initialized with device: cuda
+[MODELS] Model directory: /home/dj/zenedge/zenedge/models
+[BRIDGE] Command ring: magic=0x00000000, head=0, tail=0, size=0
+[BRIDGE] Response ring: magic=0x00000000, head=0, tail=0, size=0
+[BRIDGE] Doorbell magic: 0x00000000
+[BRIDGE] WARNING: Command ring not initialized (expected 0x51deca9e)
+[BRIDGE] WARNING: Response ring not initialized (expected 0x52535030)
+[BRIDGE] WARNING: Doorbell not initialized (expected 0x444f4f52)
+[GYM] Initialized environment: CartPole-v1
+[GYM] Bridge running. Waiting for Kernel commands...
+[BRIDGE] Starting main loop (Ctrl+C to stop)
+[BRIDGE] Poll interval: 1.0ms
+[BRIDGE] Received: RUN_MODEL payload=1 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=0 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=5 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=5 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: RUN_MODEL payload=5 flags=0x0000
+[BRIDGE] No handler for RUN_MODEL
+[BRIDGE] Received: ENV_RESET payload=0 flags=0x0000
+[GYM] Resetting environment...
+[HEAP] Allocated blob 6: 1 blocks at offset 0xcc0
+[GYM] Uploaded Model (Linear Policy) to Blob 6
+[HEAP] Allocated blob 7: 1 blocks at offset 0xd00
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 8: 1 blocks at offset 0xd40
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 9: 1 blocks at offset 0x1c40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 10: 1 blocks at offset 0x1c80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 11: 1 blocks at offset 0x1cc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 12: 1 blocks at offset 0x1d00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 13: 1 blocks at offset 0x1d40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 14: 1 blocks at offset 0x1d80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 15: 1 blocks at offset 0x1dc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 16: 1 blocks at offset 0x1e00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 17: 1 blocks at offset 0x1e40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 18: 1 blocks at offset 0x1e80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 19: 1 blocks at offset 0x1ec0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 20: 1 blocks at offset 0x1f00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 21: 1 blocks at offset 0x1f40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 22: 1 blocks at offset 0x1f80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 23: 1 blocks at offset 0x1fc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 24: 1 blocks at offset 0x2000
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 25: 1 blocks at offset 0x2040
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 26: 1 blocks at offset 0x2080
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 27: 1 blocks at offset 0x20c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 28: 1 blocks at offset 0x2100
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 29: 1 blocks at offset 0x2140
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 30: 1 blocks at offset 0x2180
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 31: 1 blocks at offset 0x21c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 32: 1 blocks at offset 0x2200
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 33: 1 blocks at offset 0x2240
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+/home/dj/.local/lib/python3.12/site-packages/gym/envs/classic_control/cartpole.py:177: UserWarning: [33mWARN: You are calling 'step()' even though this environment has already returned terminated = True. You should always call 'reset()' once you receive 'terminated = True' -- any further steps are undefined behavior.[0m
+  logger.warn(
+[HEAP] Allocated blob 34: 1 blocks at offset 0x2280
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 35: 1 blocks at offset 0x22c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 36: 1 blocks at offset 0x2300
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 37: 1 blocks at offset 0x2340
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 38: 1 blocks at offset 0x2380
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 39: 1 blocks at offset 0x23c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 40: 1 blocks at offset 0x2400
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 41: 1 blocks at offset 0x2440
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 42: 1 blocks at offset 0x2480
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 43: 1 blocks at offset 0x24c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 44: 1 blocks at offset 0x2500
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 45: 1 blocks at offset 0x2540
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 46: 1 blocks at offset 0x2580
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 47: 1 blocks at offset 0x25c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 48: 1 blocks at offset 0x2600
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 49: 1 blocks at offset 0x2640
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 50: 1 blocks at offset 0x2680
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 51: 1 blocks at offset 0x26c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 52: 1 blocks at offset 0x2700
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 53: 1 blocks at offset 0x2740
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 54: 1 blocks at offset 0x2780
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 55: 1 blocks at offset 0x27c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 56: 1 blocks at offset 0x2800
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 57: 1 blocks at offset 0x2840
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 58: 1 blocks at offset 0x2880
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 59: 1 blocks at offset 0x28c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 60: 1 blocks at offset 0x2900
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 61: 1 blocks at offset 0x2940
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 62: 1 blocks at offset 0x2980
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 63: 1 blocks at offset 0x29c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 64: 1 blocks at offset 0x2a00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 65: 1 blocks at offset 0x2a40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 66: 1 blocks at offset 0x2a80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 67: 1 blocks at offset 0x2ac0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 68: 1 blocks at offset 0x2b00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 69: 1 blocks at offset 0x2b40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 70: 1 blocks at offset 0x2b80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 71: 1 blocks at offset 0x2bc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 72: 1 blocks at offset 0x2c00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 73: 1 blocks at offset 0x2c40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 74: 1 blocks at offset 0x2c80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 75: 1 blocks at offset 0x2cc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 76: 1 blocks at offset 0x2d00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 77: 1 blocks at offset 0x2d40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 78: 1 blocks at offset 0x2d80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 79: 1 blocks at offset 0x2dc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 80: 1 blocks at offset 0x2e00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 81: 1 blocks at offset 0x2e40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 82: 1 blocks at offset 0x2e80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 83: 1 blocks at offset 0x2ec0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 84: 1 blocks at offset 0x2f00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 85: 1 blocks at offset 0x2f40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 86: 1 blocks at offset 0x2f80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 87: 1 blocks at offset 0x2fc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 88: 1 blocks at offset 0x3000
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 89: 1 blocks at offset 0x3040
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 90: 1 blocks at offset 0x3080
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 91: 1 blocks at offset 0x30c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 92: 1 blocks at offset 0x3100
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 93: 1 blocks at offset 0x3140
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 94: 1 blocks at offset 0x3180
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 95: 1 blocks at offset 0x31c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 96: 1 blocks at offset 0x3200
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 97: 1 blocks at offset 0x3240
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 98: 1 blocks at offset 0x3280
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 99: 1 blocks at offset 0x32c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 100: 1 blocks at offset 0x3300
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 101: 1 blocks at offset 0x3340
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 102: 1 blocks at offset 0x3380
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 103: 1 blocks at offset 0x33c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 104: 1 blocks at offset 0x3400
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 105: 1 blocks at offset 0x3440
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 106: 1 blocks at offset 0x3480
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 107: 1 blocks at offset 0x34c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 108: 1 blocks at offset 0x3500
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 109: 1 blocks at offset 0x3540
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 110: 1 blocks at offset 0x3580
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 111: 1 blocks at offset 0x35c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 112: 1 blocks at offset 0x3600
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 113: 1 blocks at offset 0x3640
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 114: 1 blocks at offset 0x3680
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 115: 1 blocks at offset 0x36c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 116: 1 blocks at offset 0x3700
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 117: 1 blocks at offset 0x3740
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 118: 1 blocks at offset 0x3780
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 119: 1 blocks at offset 0x37c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 120: 1 blocks at offset 0x3800
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 121: 1 blocks at offset 0x3840
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 122: 1 blocks at offset 0x3880
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 123: 1 blocks at offset 0x38c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 124: 1 blocks at offset 0x3900
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 125: 1 blocks at offset 0x3940
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 126: 1 blocks at offset 0x3980
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 127: 1 blocks at offset 0x39c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 128: 1 blocks at offset 0x3a00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 129: 1 blocks at offset 0x3a40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 130: 1 blocks at offset 0x3a80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 131: 1 blocks at offset 0x3ac0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 132: 1 blocks at offset 0x3b00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 133: 1 blocks at offset 0x3b40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 134: 1 blocks at offset 0x3b80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 135: 1 blocks at offset 0x3bc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 136: 1 blocks at offset 0x3c00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 137: 1 blocks at offset 0x3c40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 138: 1 blocks at offset 0x3c80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 139: 1 blocks at offset 0x3cc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 140: 1 blocks at offset 0x3d00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 141: 1 blocks at offset 0x3d40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 142: 1 blocks at offset 0x3d80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 143: 1 blocks at offset 0x3dc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 144: 1 blocks at offset 0x3e00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 145: 1 blocks at offset 0x3e40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 146: 1 blocks at offset 0x3e80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 147: 1 blocks at offset 0x3ec0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 148: 1 blocks at offset 0x3f00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 149: 1 blocks at offset 0x3f40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 150: 1 blocks at offset 0x3f80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 151: 1 blocks at offset 0x3fc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 152: 1 blocks at offset 0x4000
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 153: 1 blocks at offset 0x4040
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 154: 1 blocks at offset 0x4080
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 155: 1 blocks at offset 0x40c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 156: 1 blocks at offset 0x4100
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 157: 1 blocks at offset 0x4140
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 158: 1 blocks at offset 0x4180
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 159: 1 blocks at offset 0x41c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 160: 1 blocks at offset 0x4200
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 161: 1 blocks at offset 0x4240
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 162: 1 blocks at offset 0x4280
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 163: 1 blocks at offset 0x42c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 164: 1 blocks at offset 0x4300
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 165: 1 blocks at offset 0x4340
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 166: 1 blocks at offset 0x4380
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 167: 1 blocks at offset 0x43c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 168: 1 blocks at offset 0x4400
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 169: 1 blocks at offset 0x4440
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 170: 1 blocks at offset 0x4480
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 171: 1 blocks at offset 0x44c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 172: 1 blocks at offset 0x4500
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 173: 1 blocks at offset 0x4540
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 174: 1 blocks at offset 0x4580
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 175: 1 blocks at offset 0x45c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 176: 1 blocks at offset 0x4600
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 177: 1 blocks at offset 0x4640
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 178: 1 blocks at offset 0x4680
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 179: 1 blocks at offset 0x46c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 180: 1 blocks at offset 0x4700
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 181: 1 blocks at offset 0x4740
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 182: 1 blocks at offset 0x4780
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 183: 1 blocks at offset 0x47c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 184: 1 blocks at offset 0x4800
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 185: 1 blocks at offset 0x4840
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 186: 1 blocks at offset 0x4880
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 187: 1 blocks at offset 0x48c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 188: 1 blocks at offset 0x4900
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 189: 1 blocks at offset 0x4940
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 190: 1 blocks at offset 0x4980
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 191: 1 blocks at offset 0x49c0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 192: 1 blocks at offset 0x4a00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 193: 1 blocks at offset 0x4a40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 194: 1 blocks at offset 0x4a80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 195: 1 blocks at offset 0x4ac0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 196: 1 blocks at offset 0x4b00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 197: 1 blocks at offset 0x4b40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 198: 1 blocks at offset 0x4b80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 199: 1 blocks at offset 0x4bc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 200: 1 blocks at offset 0x4c00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 201: 1 blocks at offset 0x4c40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 202: 1 blocks at offset 0x4c80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 203: 1 blocks at offset 0x4cc0
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 204: 1 blocks at offset 0x4d00
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 205: 1 blocks at offset 0x4d40
+[BRIDGE] Received: ENV_STEP payload=0 flags=0x0000
+[HEAP] Allocated blob 206: 1 blocks at offset 0x4d80
+[BRIDGE] Received: ENV_STEP payload=1 flags=0x0000
+[HEAP] Allocated blob 207: 1 blocks at offset 0x4dc0

@@ -109,7 +109,7 @@ void ipc_init(void *base_addr, uint8_t irq) {
   console_write("\n");
 
   /* Initialize Heap */
-  heap_init((void *)(base + 0x20000));
+  heap_init((void *)(base + IPC_HEAP_CTL_OFFSET));
 
   /* Register Interrupt Handler */
   /* IRQ is the ISA IRQ number (e.g. 11) */
@@ -143,6 +143,86 @@ static void ring_cmd_doorbell(uint32_t head) {
     doorbell->cmd_flags |= DOORBELL_FLAG_PENDING;
     doorbell->cmd_irq_count++;
   }
+}
+
+/* =============================================================================
+ * KERNEL MESH IMPLEMENTATION
+ * =============================================================================
+ */
+
+/* Mesh state */
+static volatile mesh_table_t *mesh_table = NULL;
+static int local_node_id = -1;
+
+void ipc_mesh_init(void) {
+    if (!ipc_shmem_base) return;
+    
+    mesh_table = (mesh_table_t*)((uint8_t*)ipc_shmem_base + IPC_MESH_OFFSET);
+    
+    /* Initialize table if magic is missing (Race condition? First wins) */
+    if (mesh_table->magic != MESH_MAGIC) {
+        mesh_table->magic = MESH_MAGIC;
+        mesh_table->version = 1;
+        mesh_table->active_nodes = 0;
+        for(int i=0; i<MES_MAX_NODES; i++) {
+            mesh_table->nodes[i].status = NODE_STATUS_OFFLINE;
+        }
+        console_write("[ipc] initialized mesh table\n");
+    }
+    
+    /* Register Local Node */
+    for(int i=0; i<MES_MAX_NODES; i++) {
+         if (mesh_table->nodes[i].status == NODE_STATUS_OFFLINE) {
+             /* Claim it */
+             mesh_table->nodes[i].status = NODE_STATUS_ALIVE;
+             mesh_table->nodes[i].node_id = i;
+             mesh_table->nodes[i].cpu_load = 0;
+             mesh_table->nodes[i].heartbeat = 0;
+             
+             local_node_id = i;
+             mesh_table->active_nodes++; // Not atomic but okay for demo
+             
+             console_write("[ipc] joined mesh as Node ");
+             print_uint(local_node_id);
+             console_write("\n");
+             break;
+         }
+    }
+    
+    if (local_node_id == -1) {
+        console_write("[ipc] WARNING: mesh full, could not join\n");
+    }
+}
+
+void ipc_mesh_update(void) {
+    if (local_node_id < 0 || !mesh_table) return;
+    
+    /* Update heartbeat */
+    mesh_table->nodes[local_node_id].heartbeat++; 
+}
+
+void ipc_mesh_dump(void) {
+    if (!mesh_table || mesh_table->magic != MESH_MAGIC) {
+        console_write("[ipc] mesh not initialized\n");
+        return;
+    }
+    
+    console_write("=== KERNEL MESH ===\n");
+    for(int i=0; i<MES_MAX_NODES; i++) {
+        if (mesh_table->nodes[i].status != NODE_STATUS_OFFLINE) {
+            console_write("Node ");
+            print_uint(i);
+            console_write(": ");
+            if (i == local_node_id) console_write("(ME) ");
+            console_write(mesh_table->nodes[i].status == NODE_STATUS_ALIVE ? "ALIVE" : "BUSY");
+            console_write(" Load=");
+            print_uint(mesh_table->nodes[i].cpu_load);
+            console_write(" Heartbeat=");
+            print_hex32((uint32_t)mesh_table->nodes[i].heartbeat);
+            console_write("\n");
+        }
+    }
+    console_write("===================\n");
 }
 
 int ipc_send(uint16_t cmd, uint32_t payload) {
@@ -390,3 +470,5 @@ void ipc_dump_debug(void) {
 
   console_write("[ipc] === END DUMP ===\n");
 }
+
+

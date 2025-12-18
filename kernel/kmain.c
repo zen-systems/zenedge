@@ -21,6 +21,7 @@
 #include "shell.h"
 #include "time/time.h"
 #include "trace/flightrec.h"
+#include "lib/math.h"
 
 /* Minimal serial output for debugging */
 static inline void outb(uint16_t port, uint8_t val) {
@@ -79,33 +80,56 @@ void kmain(multiboot_info_t *mboot_info) {
   /* Pass the dynamically detected shared memory base and IRQ */
   ipc_init(ivshmem_get_shared_memory(), ivshmem_get_irq());
 
-  /* Enter Kernel Shell */
-  shell_start();
+  /* Initialize Kernel Mesh */
+  ipc_mesh_init();
 
-  /* Should not be reached */
-  while (1) {
-    __asm__ __volatile__("hlt");
+  /* Test IPC: send command to Real Bridge */
+  console_write("\n--- IPC Inference Demo ---\n");
+
+  /* 1. Allocate input tensor (1x28x28 float32 for MNIST) */
+  uint32_t input_shape[] = {1, 28, 28};
+  uint16_t input_tensor = heap_alloc_tensor(DTYPE_FLOAT32, 3, input_shape);
+  console_write("[test] Allocated input tensor: id=");
+  print_uint(input_tensor);
+  console_write("\n");
+
+  /* 2. Fill with dummy data */
+  float *input_data = (float *)heap_get_tensor_data(input_tensor);
+  if (input_data) {
+      for(int i=0; i<28*28; i++) input_data[i] = 0.5f;
   }
 
-  /* Test IPC */
-  /* Test IPC: send command, simulate consumer, poll response */
-  console_write("\n--- IPC Ring Buffer Demo ---\n");
-  ipc_send(CMD_PING, 0xDEADBEEF);
-  ipc_dump_debug();
+  /* 3. Send Run Model Command */
+  console_write("[test] Sending CMD_RUN_MODEL...\n");
+  ipc_send(CMD_RUN_MODEL, input_tensor);
 
-  /* Simulate Linux consumer (processes command, sends response) */
-  ipc_consume_one();
-
-  /* Poll for response from "Linux" */
-  console_write("[kmain] Polling for response...\n");
+  /* 4. Poll for response (timeout after ~5s) */
+  console_write("[test] Polling for response...\n");
+  
   ipc_response_t rsp;
-  if (ipc_poll_response(&rsp)) {
-    console_write("[kmain] Got response! status=");
+  int timeout = 500; /* 500 * 10ms = 5s */
+  int received = 0;
+  
+  while(timeout > 0) {
+      if (ipc_poll_response(&rsp)) {
+          received = 1;
+          break;
+      }
+      pit_sleep_ms(10); /* Sleep 10ms */
+      timeout--;
+  }
+
+  if (received) {
+    console_write("[test] Got response! status=");
     print_hex32(rsp.status);
-    console_write(" result=");
+    console_write(" result_blob=");
     print_hex32(rsp.result);
     console_write("\n");
+  } else {
+    console_write("[test] Timeout waiting for response!\n");
   }
+
+
 
   ipc_dump_debug();
 
@@ -328,6 +352,71 @@ void kmain(multiboot_info_t *mboot_info) {
 
   sched_run_job(&ctx2);
 
+
+  /* ===== Demo 3: Distributed Pipeline (Host Acceleration) ===== */
+  console_write("\n--- Demo 3: Distributed Pipeline (Host Acceleration) ---\n");
+  console_write("[demo] Creating multi-stage neural network job...\n");
+
+  /* Job 3: 3-Layer MLP */
+  job_graph_t job3;
+  job_graph_init(&job3, 3);
+
+  /* Steps: Layer 1, Layer 2, Layer 3 (all COMPUTE) */
+  job_graph_add_step(&job3, 0, STEP_TYPE_COMPUTE);
+  job_graph_add_step(&job3, 1, STEP_TYPE_COMPUTE);
+  job_graph_add_step(&job3, 2, STEP_TYPE_COMPUTE);
+
+  /* Dependencies: 0 -> 1 -> 2 */
+  job_graph_add_dep(&job3, 1, 0);
+  job_graph_add_dep(&job3, 2, 1);
+
+  /* Allocate Data Tensors */
+  /* Tensor 1: Input (784 features) */
+  /* Tensor 2: Hidden 1 (128 features) */
+  /* Tensor 3: Hidden 2 (64 features) */
+  /* Tensor 4: Output (10 logits) */
+  
+  /* Allocate actual blob for input input */
+  uint32_t t1_shape[] = {1, 784};
+  uint16_t t1_blob = heap_alloc_tensor(DTYPE_FLOAT32, 2, t1_shape);
+  
+  /* We register them in the graph using the blob IDs as tensor IDs 
+     (Simplification: job graph normally uses logical IDs, but our scheduler
+      currently sends s->inputs[0] directly as payload, so we use blob ID)
+  */
+  
+  /* Link input to step 0 */
+  /* Note: job_graph_step_add_input expects logical ID, but our modified scheduler 
+     sends s->inputs[0] as payload. So we put the blob ID there. */
+  job3.steps[0].num_inputs = 1;
+  job3.steps[0].inputs[0] = t1_blob; // Layer 1 Input
+  
+  /* For intermediate steps, we might want to pass the previous result?
+     Our current simple scheduler doesn't chain results automatically.
+     But we can pretend for the demo.
+  */
+  job3.steps[1].num_inputs = 1;
+  job3.steps[1].inputs[0] = t1_blob; // Re-use input (simulating data flow)
+
+  job3.steps[2].num_inputs = 1;
+  job3.steps[2].inputs[0] = t1_blob; // Re-use input
+
+  /* Contract for accelerated job */
+  task_contract_t accel_contract = {
+      .cpu_budget_us = 100000, /* Generous budget for IPC overhead */
+      .memory_kb = 1024,
+      .accel_slots = 1,
+      .prio = CONTRACT_PRIORITY_HIGH,
+      .job_id = 3
+  };
+  
+  contract_apply(&accel_contract);
+  
+  sched_job_ctx_t ctx3 = {.job = &job3, .contract = accel_contract};
+  
+  console_write("[demo] Submitting pipeline job to scheduler...\n");
+  sched_run_job(&ctx3);
+
   /* Final state */
   console_write("\n--- Final Contract States ---\n");
   contract_debug_print(&realtime_contract);
@@ -349,7 +438,120 @@ void kmain(multiboot_info_t *mboot_info) {
 
   /* ===== User Mode Demo ===== */
   console_write("\n--- Round Robin Scheduler Demo ---\n");
-  sched_test_rr();
+  
+  /* Dump Mesh State */
+  /* ipc_mesh_dump(); */
+  
+  /* Enable FPU */
+  __asm__ __volatile__("finit");
+  
+  /* ===== In-Kernel Inference Demo ===== */
+  console_write("\n--- In-Kernel Inference Demo (Neural Kernel) ---\n");
+  
+  /* 1. Reset Environment */
+  console_write("[kern] Resetting environment...\n");
+  uint32_t current_blob_id = 0;
+  
+  if (ipc_send(CMD_ENV_RESET, 0) == 0) {
+      ipc_response_t rsp;
+      /* Busy wait for response (Polling Mode) */
+      while (!ipc_poll_response(&rsp)) { __asm__ __volatile__("pause"); }
+      
+      console_write("[kern] Response received.\n");
+      if (rsp.status == RSP_OK) {
+          current_blob_id = rsp.result;
+          console_write("[kern] Reset OK. Init Blob: ");
+          print_uint(current_blob_id);
+          console_write("\n");
+      }
+  }
+  
+  /* 2. Control Loop */
+  if (current_blob_id > 0) {
+      console_write("[kern] Starting Neural Control Loop (200 steps)...\n");
+      
+      for (int i = 0; i < 200; i++) {
+            /* Get Data from Current Blob */
+            float *data = (float*)heap_get_data(current_blob_id);
+            if (!data) {
+                console_write("[kern] Error: Invalid blob data\n");
+                break;
+            }
+            
+            /* Parse Blob:
+             * [0-3] Obs
+             * [4]   Reward
+             * [5]   Done
+             * [6]   Model Blob ID
+             */
+            float *obs = &data[0];
+            uint32_t done_bits = ((uint32_t*)data)[5];
+             /* 0.5f is 0x3F000000 */
+            if (done_bits > 0x3F000000) {
+                console_write("[kern] Episode Finised at step ");
+                print_uint(i);
+                console_write("\n");
+                break;
+            }
+            
+            /* Get Model */
+            uint32_t model_id = (uint32_t)data[6]; // Cast float to int (assumes exact representaion for small ints)
+            float *weights = (float*)heap_get_data(model_id);
+            
+            uint32_t action = 0;
+            if (weights) {
+                /* IN-KERNEL INFERENCE */
+                float score = math_vec_dot(obs, weights, 4);
+                
+                /* Policy: If score > 0, Action 1 (Right), else 0 (Left) */
+                /* score > 0 check: float representation logic or simple cast? */
+                /* simple cast to int might lose sign bit logic if not careful, 
+                   but standard comparison works if we link soft-float or just use bits.
+                   Let's use bits for safety against linker errors again?
+                   0.0f is 0x00000000. -0.0f is 0x80000000.
+                   Positive numbers have top bit 0.
+                   Let's try standard > 0.0f first, if linker fails, fix it.
+                   Actually, math_vec_dot returns float, so we probably need __gtsf2 again.
+                   Let's implement a quick manual check.
+                */
+                uint32_t score_bits = *(uint32_t*)&score;
+                /* Positive if sign bit (31) is 0 and not zero */
+                int is_positive = ((score_bits & 0x80000000) == 0) && ((score_bits & 0x7FFFFFFF) != 0);
+                
+                action = is_positive ? 1 : 0;
+                
+                /* Debug every 10 steps */
+                if (i % 20 == 0) {
+                    console_write("[kern] Step "); print_uint(i);
+                    console_write(" Score: "); print_hex32(score_bits); /* Hex to avoid float printing complexity */
+                    console_write(" Action: "); print_uint(action);
+                    console_write("\n");
+                }
+            } else {
+                console_write("[kern] Warn: No model weights found (ID ");
+                print_uint(model_id);
+                console_write("). Using Heuristic.\n");
+                action = (i % 2);
+            }
+            
+            /* Send Action */
+            ipc_send(CMD_ENV_STEP, action);
+            
+            /* Wait for Next State */
+            ipc_response_t rsp;
+            while (!ipc_poll_response(&rsp)) { __asm__ __volatile__("pause"); }
+            
+            if (rsp.status != RSP_OK) {
+                console_write("[kern] Step failed.\n");
+                break;
+            }
+            current_blob_id = rsp.result;
+      }
+  }
+  
+  console_write("[kern] Inference Demo Completed.\n");
+  
+  /* sched_test_rr(); */
 
   /* Enable interrupts to start ticking and scheduling */
   /* Note: sched_test_rr sets up 'current_process' as the idle task.
