@@ -1,0 +1,73 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1E70+06F31E70 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[keyboard] initialized
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[pci] Scanning Bus 0...
+[pci] Found 0x00008086:0x00001237 at 0:0.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007000 at 0:1.0 (Class 0x00000006)
+[pci] Found 0x00008086:0x00007010 at 0:1.1 (Class 0x00000001)
+[pci] Found 0x00008086:0x00007113 at 0:1.3 (Class 0x00000006)
+[pci] Found 0x00001234:0x00001111 at 0:2.0 (Class 0x00000003)
+[pci] Found 0x00008086:0x0000100E at 0:3.0 (Class 0x00000002)
+[pci] Found 0x00001234:0x000011E8 at 0:4.0 (Class 0x00000000)
+[ivshmem] Found device at 0:4.0
+[ivshmem] Shared Memory Phys: 0xFEA00000 Size: 1048576 bytes
+[ivshmem] Mapped to Virt: 0xE0000000
+[ipc] initializing proxy driver...
+[ipc] cmd ring at 0x0x02000000
+[ipc] rsp ring at 0x0x02008000
+[ipc] doorbell at 0x0x02010000
+[heap] initialized: 956KB, 15296 blocks
+
+ZENEDGE Kernel Shell (ksh)
+Type 'help' for commands.
+
+ZE> qemu-system-i386: terminating on signal 15 from pid 47068 (<unknown process>)

@@ -1,0 +1,513 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00117000
+[pmm] NUMA node 0: PFN 256-16496 (16217 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129828 KB (32457 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64868 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2437us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6877us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2313us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11627us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2534us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 3154us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 5688us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+581 | BOOT | 0 | 0 | -
+3052 | BOOT | 0 | 0 | 0x00007EC9
+4257 | BOOT | 0 | 0 | 0x0000C0DE
+10848 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+11266 | MEM_ALLOC | 1 | 0 | 0x00000001
+11436 | MEM_ALLOC | 1 | 0 | 0x00000001
+11536 | MEM_ALLOC | 1 | 0 | 0x00000001
+11639 | MEM_ALLOC | 1 | 0 | 0x00000001
+11721 | MEM_EXCEED | 1 | 0 | 0x00000014
+12082 | STATE_CHANGE | 1 | 0 | 0x00000001
+12104 | MEM_ALLOC | 1 | 0 | 0x00000001
+12853 | MEM_FREE | 1 | 0 | 0x00000001
+12867 | MEM_FREE | 1 | 0 | 0x00000001
+12875 | MEM_FREE | 1 | 0 | 0x00000001
+12882 | MEM_FREE | 1 | 0 | 0x00000001
+12889 | MEM_FREE | 1 | 0 | 0x00000001
+13137 | JOB_SUBMIT | 1 | 0 | 0x00000003
+13246 | STEP_START | 1 | 0 | -
+15717 | STEP_END | 1 | 0 | 2437us
+16584 | BUDGET_EXCEED | 1 | 0 | 0x00000985
+16727 | STEP_START | 1 | 1 | -
+23610 | STEP_END | 1 | 1 | 6877us
+23950 | BUDGET_EXCEED | 1 | 1 | 0x00001ADD
+23970 | STEP_START | 1 | 2 | -
+26285 | STEP_END | 1 | 2 | 2313us
+26507 | BUDGET_EXCEED | 1 | 2 | 0x00000909
+26678 | JOB_COMPLETE | 1 | 0 | -
+27730 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+28281 | MEM_ALLOC | 2 | 1 | 0x00000001
+28583 | MEM_ALLOC | 2 | 1 | 0x00000001
+28706 | MEM_EXCEED | 2 | 0 | 0x0000000C
+28943 | STATE_CHANGE | 2 | 0 | 0x00000001
+28946 | MEM_ALLOC | 2 | 1 | 0x00000001
+29453 | MEM_FREE | 2 | 1 | 0x00000001
+29462 | MEM_FREE | 2 | 1 | 0x00000001
+29469 | MEM_FREE | 2 | 1 | 0x00000001
+29629 | JOB_SUBMIT | 2 | 0 | 0x00000002
+29632 | STEP_START | 2 | 0 | -
+32167 | STEP_END | 2 | 0 | 2534us
+32389 | BUDGET_EXCEED | 2 | 0 | 0x000009E6
+32394 | STEP_START | 2 | 1 | -
+35552 | STEP_END | 2 | 1 | 3154us
+35800 | BUDGET_EXCEED | 2 | 1 | 0x00000C52
+35908 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (44 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011A000 (virt 0xC011A000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00117000
+[pmm] NUMA node 0: PFN 256-16496 (16217 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129828 KB (32457 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64868 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2302us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6632us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2231us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11165us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2206us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2282us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4488us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+386 | BOOT | 0 | 0 | -
+2466 | BOOT | 0 | 0 | 0x00007EC9
+3421 | BOOT | 0 | 0 | 0x0000C0DE
+8175 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+8435 | MEM_ALLOC | 1 | 0 | 0x00000001
+8544 | MEM_ALLOC | 1 | 0 | 0x00000001
+8608 | MEM_ALLOC | 1 | 0 | 0x00000001
+8654 | MEM_ALLOC | 1 | 0 | 0x00000001
+8711 | MEM_EXCEED | 1 | 0 | 0x00000014
+8911 | STATE_CHANGE | 1 | 0 | 0x00000001
+8928 | MEM_ALLOC | 1 | 0 | 0x00000001
+9493 | MEM_FREE | 1 | 0 | 0x00000001
+9506 | MEM_FREE | 1 | 0 | 0x00000001
+9513 | MEM_FREE | 1 | 0 | 0x00000001
+9520 | MEM_FREE | 1 | 0 | 0x00000001
+9527 | MEM_FREE | 1 | 0 | 0x00000001
+9720 | JOB_SUBMIT | 1 | 0 | 0x00000003
+9828 | STEP_START | 1 | 0 | -
+12164 | STEP_END | 1 | 0 | 2302us
+12514 | BUDGET_EXCEED | 1 | 0 | 0x000008FE
+12647 | STEP_START | 1 | 1 | -
+19282 | STEP_END | 1 | 1 | 6632us
+19502 | BUDGET_EXCEED | 1 | 1 | 0x000019E8
+19530 | STEP_START | 1 | 2 | -
+21762 | STEP_END | 1 | 2 | 2231us
+21909 | BUDGET_EXCEED | 1 | 2 | 0x000008B7
+22006 | JOB_COMPLETE | 1 | 0 | -
+22877 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+23370 | MEM_ALLOC | 2 | 1 | 0x00000001
+23494 | MEM_ALLOC | 2 | 1 | 0x00000001
+23557 | MEM_EXCEED | 2 | 0 | 0x0000000C
+23651 | STATE_CHANGE | 2 | 0 | 0x00000001
+23653 | MEM_ALLOC | 2 | 1 | 0x00000001
+23872 | MEM_FREE | 2 | 1 | 0x00000001
+23879 | MEM_FREE | 2 | 1 | 0x00000001
+23891 | MEM_FREE | 2 | 1 | 0x00000001
+24006 | JOB_SUBMIT | 2 | 0 | 0x00000002
+24008 | STEP_START | 2 | 0 | -
+26216 | STEP_END | 2 | 0 | 2206us
+26356 | BUDGET_EXCEED | 2 | 0 | 0x0000089E
+26358 | STEP_START | 2 | 1 | -
+28641 | STEP_END | 2 | 1 | 2282us
+28785 | BUDGET_EXCEED | 2 | 1 | 0x000008EA
+28854 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (44 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011A000 (virt 0xC011A000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to G[15;12H[15;13HRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00117000
+[pmm] NUMA node 0: PFN 256-16496 (16217 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129828 KB (32457 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64868 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2415us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6914us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2205us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11534us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2199us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2415us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4614us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+392 | BOOT | 0 | 0 | -
+2503 | BOOT | 0 | 0 | 0x00007EC9
+3783 | BOOT | 0 | 0 | 0x0000C0DE
+9716 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+10015 | MEM_ALLOC | 1 | 0 | 0x00000001
+10135 | MEM_ALLOC | 1 | 0 | 0x00000001
+10217 | MEM_ALLOC | 1 | 0 | 0x00000001
+10264 | MEM_ALLOC | 1 | 0 | 0x00000001
+10322 | MEM_EXCEED | 1 | 0 | 0x00000014
+10538 | STATE_CHANGE | 1 | 0 | 0x00000001
+10556 | MEM_ALLOC | 1 | 0 | 0x00000001
+11204 | MEM_FREE | 1 | 0 | 0x00000001
+11218 | MEM_FREE | 1 | 0 | 0x00000001
+11226 | MEM_FREE | 1 | 0 | 0x00000001
+11233 | MEM_FREE | 1 | 0 | 0x00000001
+11244 | MEM_FREE | 1 | 0 | 0x00000001
+11444 | JOB_SUBMIT | 1 | 0 | 0x00000003
+11571 | STEP_START | 1 | 0 | -
+14024 | STEP_END | 1 | 0 | 2415us
+14427 | BUDGET_EXCEED | 1 | 0 | 0x0000096F
+14564 | STEP_START | 1 | 1 | -
+21481 | STEP_END | 1 | 1 | 6914us
+21682 | BUDGET_EXCEED | 1 | 1 | 0x00001B02
+21699 | STEP_START | 1 | 2 | -
+23905 | STEP_END | 1 | 2 | 2205us
+24051 | BUDGET_EXCEED | 1 | 2 | 0x0000089D
+24150 | JOB_COMPLETE | 1 | 0 | -
+25037 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+25539 | MEM_ALLOC | 2 | 1 | 0x00000001
+25673 | MEM_ALLOC | 2 | 1 | 0x00000001
+25738 | MEM_EXCEED | 2 | 0 | 0x0000000C
+25833 | STATE_CHANGE | 2 | 0 | 0x00000001
+25835 | MEM_ALLOC | 2 | 1 | 0x00000001
+26048 | MEM_FREE | 2 | 1 | 0x00000001
+26056 | MEM_FREE | 2 | 1 | 0x00000001
+26063 | MEM_FREE | 2 | 1 | 0x00000001
+26181 | JOB_SUBMIT | 2 | 0 | 0x00000002
+26183 | STEP_START | 2 | 0 | -
+28383 | STEP_END | 2 | 0 | 2199us
+28534 | BUDGET_EXCEED | 2 | 0 | 0x00000897
+28536 | STEP_START | 2 | 1 | -
+30953 | STEP_END | 2 | 1 | 2415us
+31111 | BUDGET_EXCEED | 2 | 1 | 0x0000096F
+31188 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (44 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+qemu-system-i386: terminating on signal 15 from pid 16093 (<unknown process>)

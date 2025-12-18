@@ -1,0 +1,64 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+[ipc] initializing proxy driver...
+
+
+*** KERNEL PANIC: Page Fault ***
+  Vector: 0x0000000E  Error: 0x00000002
+  EIP: 0xC010CFB8  CS: 0x00000008  EFLAGS: 0x00010216
+  EAX: 0x00000000  EBX: 0x00010000  ECX: 0x0200F000  EDX: 0x00000003
+  ESI: 0x00010000  EDI: 0x00101C80  EBP: 0x00103430
+  CR2 (fault addr): 0x02010000
+  Fault: not-present write kernel 
+
+System halted.
+qemu-system-i386: terminating on signal 15 from pid 33957 (<unknown process>)

@@ -1,0 +1,31 @@
+/* linker.ld */
+ENTRY(start)
+
+SECTIONS
+{
+  /* Multiboot requires the header to be in the first 8K */
+  . = 1M;
+
+  .text ALIGN(4K) :
+  {
+    *(.multiboot)
+    *(.text*)
+  }
+
+  .rodata ALIGN(4K) :
+  {
+    *(.rodata*)
+  }
+
+  .data ALIGN(4K) :
+  {
+    *(.data*)
+  }
+
+  .bss ALIGN(4K) :
+  {
+    *(COMMON)
+    *(.bss*)
+  }
+}
+

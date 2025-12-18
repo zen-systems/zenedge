@@ -1,0 +1,4068 @@
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 4368us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 10686us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2309us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 17363us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 11969us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2202us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 14171us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+499 | BOOT | 0 | 0 | -
+3804 | BOOT | 0 | 0 | 0x00007EC8
+5807 | BOOT | 0 | 0 | 0x0000C0DE
+21154 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+22280 | UNKNOWN | 100 | 8 | 0x00001388
+22740 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+25011 | UNKNOWN | 100 | 1 | 0x00000008
+26059 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+26743 | MEM_ALLOC | 1 | 0 | 0x00000001
+26877 | MEM_ALLOC | 1 | 0 | 0x00000001
+26962 | MEM_ALLOC | 1 | 0 | 0x00000001
+27024 | MEM_ALLOC | 1 | 0 | 0x00000001
+27778 | MEM_EXCEED | 1 | 0 | 0x00000014
+28842 | STATE_CHANGE | 1 | 0 | 0x00000001
+28864 | MEM_ALLOC | 1 | 0 | 0x00000001
+29572 | MEM_FREE | 1 | 0 | 0x00000001
+29585 | MEM_FREE | 1 | 0 | 0x00000001
+29592 | MEM_FREE | 1 | 0 | 0x00000001
+29599 | MEM_FREE | 1 | 0 | 0x00000001
+29606 | MEM_FREE | 1 | 0 | 0x00000001
+29828 | JOB_SUBMIT | 1 | 0 | 0x00000003
+29935 | STEP_START | 1 | 0 | -
+34329 | STEP_END | 1 | 0 | 4368us
+34746 | BUDGET_EXCEED | 1 | 0 | 0x00001110
+34874 | STEP_START | 1 | 1 | -
+45563 | STEP_END | 1 | 1 | 10686us
+45850 | BUDGET_EXCEED | 1 | 1 | 0x000029BE
+45868 | STEP_START | 1 | 2 | -
+48177 | STEP_END | 1 | 2 | 2309us
+48382 | BUDGET_EXCEED | 1 | 2 | 0x00000905
+48516 | JOB_COMPLETE | 1 | 0 | -
+49842 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+50016 | MEM_ALLOC | 2 | 1 | 0x00000001
+50183 | MEM_ALLOC | 2 | 1 | 0x00000001
+50256 | MEM_EXCEED | 2 | 0 | 0x0000000C
+50711 | STATE_CHANGE | 2 | 0 | 0x00000001
+50713 | MEM_ALLOC | 2 | 1 | 0x00000001
+50921 | MEM_FREE | 2 | 1 | 0x00000001
+50929 | MEM_FREE | 2 | 1 | 0x00000001
+50936 | MEM_FREE | 2 | 1 | 0x00000001
+51050 | JOB_SUBMIT | 2 | 0 | 0x00000002
+51052 | STEP_START | 2 | 0 | -
+63025 | STEP_END | 2 | 0 | 11969us
+63204 | BUDGET_EXCEED | 2 | 0 | 0x00002EC1
+63208 | STEP_START | 2 | 1 | -
+65411 | STEP_END | 2 | 1 | 2202us
+65964 | BUDGET_EXCEED | 2 | 1 | 0x0000089A
+66202 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011B000 (virt 0xC011B000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[Uc[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2306us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6561us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2205us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11072us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2241us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2200us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4441us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+405 | BOOT | 0 | 0 | -
+2498 | BOOT | 0 | 0 | 0x00007EC8
+3450 | BOOT | 0 | 0 | 0x0000C0DE
+9195 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+10160 | UNKNOWN | 100 | 8 | 0x00001388
+10518 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+10999 | UNKNOWN | 100 | 1 | 0x00000008
+11547 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+12380 | MEM_ALLOC | 1 | 0 | 0x00000001
+12507 | MEM_ALLOC | 1 | 0 | 0x00000001
+12576 | MEM_ALLOC | 1 | 0 | 0x00000001
+12624 | MEM_ALLOC | 1 | 0 | 0x00000001
+12682 | MEM_EXCEED | 1 | 0 | 0x00000014
+12891 | STATE_CHANGE | 1 | 0 | 0x00000001
+12912 | MEM_ALLOC | 1 | 0 | 0x00000001
+13513 | MEM_FREE | 1 | 0 | 0x00000001
+13526 | MEM_FREE | 1 | 0 | 0x00000001
+13533 | MEM_FREE | 1 | 0 | 0x00000001
+13540 | MEM_FREE | 1 | 0 | 0x00000001
+13547 | MEM_FREE | 1 | 0 | 0x00000001
+13740 | JOB_SUBMIT | 1 | 0 | 0x00000003
+13844 | STEP_START | 1 | 0 | -
+16182 | STEP_END | 1 | 0 | 2306us
+16543 | BUDGET_EXCEED | 1 | 0 | 0x00000902
+16670 | STEP_START | 1 | 1 | -
+23233 | STEP_END | 1 | 1 | 6561us
+23413 | BUDGET_EXCEED | 1 | 1 | 0x000019A1
+23426 | STEP_START | 1 | 2 | -
+25632 | STEP_END | 1 | 2 | 2205us
+25777 | BUDGET_EXCEED | 1 | 2 | 0x0000089D
+25874 | JOB_COMPLETE | 1 | 0 | -
+26763 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+26909 | MEM_ALLOC | 2 | 1 | 0x00000001
+27029 | MEM_ALLOC | 2 | 1 | 0x00000001
+27093 | MEM_EXCEED | 2 | 0 | 0x0000000C
+27543 | STATE_CHANGE | 2 | 0 | 0x00000001
+27545 | MEM_ALLOC | 2 | 1 | 0x00000001
+27757 | MEM_FREE | 2 | 1 | 0x00000001
+27764 | MEM_FREE | 2 | 1 | 0x00000001
+27771 | MEM_FREE | 2 | 1 | 0x00000001
+27888 | JOB_SUBMIT | 2 | 0 | 0x00000002
+27890 | STEP_START | 2 | 0 | -
+30133 | STEP_END | 2 | 0 | 2241us
+30280 | BUDGET_EXCEED | 2 | 0 | 0x000008C1
+30283 | STEP_START | 2 | 1 | -
+32483 | STEP_END | 2 | 1 | 2200us
+32627 | BUDGET_EXCEED | 2 | 1 | 0x00000898
+32699 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011B000 (virt 0xC011B000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Helloc[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2255us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6480us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2202us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 10937us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2164us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2155us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4319us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+383 | BOOT | 0 | 0 | -
+2451 | BOOT | 0 | 0 | 0x00007EC8
+3358 | BOOT | 0 | 0 | 0x0000C0DE
+8967 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+10018 | UNKNOWN | 100 | 8 | 0x00001388
+10378 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+10842 | UNKNOWN | 100 | 1 | 0x00000008
+11372 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+12024 | MEM_ALLOC | 1 | 0 | 0x00000001
+12138 | MEM_ALLOC | 1 | 0 | 0x00000001
+12210 | MEM_ALLOC | 1 | 0 | 0x00000001
+12256 | MEM_ALLOC | 1 | 0 | 0x00000001
+12311 | MEM_EXCEED | 1 | 0 | 0x00000014
+12509 | STATE_CHANGE | 1 | 0 | 0x00000001
+12529 | MEM_ALLOC | 1 | 0 | 0x00000001
+13099 | MEM_FREE | 1 | 0 | 0x00000001
+13116 | MEM_FREE | 1 | 0 | 0x00000001
+13123 | MEM_FREE | 1 | 0 | 0x00000001
+13129 | MEM_FREE | 1 | 0 | 0x00000001
+13136 | MEM_FREE | 1 | 0 | 0x00000001
+13314 | JOB_SUBMIT | 1 | 0 | 0x00000003
+13418 | STEP_START | 1 | 0 | -
+15703 | STEP_END | 1 | 0 | 2255us
+16042 | BUDGET_EXCEED | 1 | 0 | 0x000008CF
+16174 | STEP_START | 1 | 1 | -
+22655 | STEP_END | 1 | 1 | 6480us
+22813 | BUDGET_EXCEED | 1 | 1 | 0x00001950
+22824 | STEP_START | 1 | 2 | -
+25029 | STEP_END | 1 | 2 | 2202us
+25243 | BUDGET_EXCEED | 1 | 2 | 0x0000089A
+25338 | JOB_COMPLETE | 1 | 0 | -
+26147 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+26283 | MEM_ALLOC | 2 | 1 | 0x00000001
+26404 | MEM_ALLOC | 2 | 1 | 0x00000001
+26471 | MEM_EXCEED | 2 | 0 | 0x0000000C
+26914 | STATE_CHANGE | 2 | 0 | 0x00000001
+26915 | MEM_ALLOC | 2 | 1 | 0x00000001
+27117 | MEM_FREE | 2 | 1 | 0x00000001
+27124 | MEM_FREE | 2 | 1 | 0x00000001
+27131 | MEM_FREE | 2 | 1 | 0x00000001
+27243 | JOB_SUBMIT | 2 | 0 | 0x00000002
+27244 | STEP_START | 2 | 0 | -
+29409 | STEP_END | 2 | 0 | 2164us
+29548 | BUDGET_EXCEED | 2 | 0 | 0x00000874
+29550 | STEP_START | 2 | 1 | -
+31706 | STEP_END | 2 | 1 | 2155us
+31839 | BUDGET_EXCEED | 2 | 1 | 0x0000086B
+31906 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011B000 (virt 0xC011B000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Helloc[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2581us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6483us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2209us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11273us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2519us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2250us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4769us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+392 | BOOT | 0 | 0 | -
+2467 | BOOT | 0 | 0 | 0x00007EC8
+3396 | BOOT | 0 | 0 | 0x0000C0DE
+9556 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+10485 | UNKNOWN | 100 | 8 | 0x00001388
+10832 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+11293 | UNKNOWN | 100 | 1 | 0x00000008
+11822 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+12458 | MEM_ALLOC | 1 | 0 | 0x00000001
+12570 | MEM_ALLOC | 1 | 0 | 0x00000001
+12633 | MEM_ALLOC | 1 | 0 | 0x00000001
+12679 | MEM_ALLOC | 1 | 0 | 0x00000001
+12735 | MEM_EXCEED | 1 | 0 | 0x00000014
+12935 | STATE_CHANGE | 1 | 0 | 0x00000001
+12957 | MEM_ALLOC | 1 | 0 | 0x00000001
+13552 | MEM_FREE | 1 | 0 | 0x00000001
+13565 | MEM_FREE | 1 | 0 | 0x00000001
+13572 | MEM_FREE | 1 | 0 | 0x00000001
+13579 | MEM_FREE | 1 | 0 | 0x00000001
+13586 | MEM_FREE | 1 | 0 | 0x00000001
+13771 | JOB_SUBMIT | 1 | 0 | 0x00000003
+13879 | STEP_START | 1 | 0 | -
+16491 | STEP_END | 1 | 0 | 2581us
+16916 | BUDGET_EXCEED | 1 | 0 | 0x00000A15
+17054 | STEP_START | 1 | 1 | -
+23539 | STEP_END | 1 | 1 | 6483us
+23765 | BUDGET_EXCEED | 1 | 1 | 0x00001953
+23782 | STEP_START | 1 | 2 | -
+25994 | STEP_END | 1 | 2 | 2209us
+26174 | BUDGET_EXCEED | 1 | 2 | 0x000008A1
+26294 | JOB_COMPLETE | 1 | 0 | -
+27280 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+27427 | MEM_ALLOC | 2 | 1 | 0x00000001
+27569 | MEM_ALLOC | 2 | 1 | 0x00000001
+27634 | MEM_EXCEED | 2 | 0 | 0x0000000C
+28078 | STATE_CHANGE | 2 | 0 | 0x00000001
+28080 | MEM_ALLOC | 2 | 1 | 0x00000001
+28281 | MEM_FREE | 2 | 1 | 0x00000001
+28289 | MEM_FREE | 2 | 1 | 0x00000001
+28297 | MEM_FREE | 2 | 1 | 0x00000001
+28412 | JOB_SUBMIT | 2 | 0 | 0x00000002
+28416 | STEP_START | 2 | 0 | -
+30937 | STEP_END | 2 | 0 | 2519us
+31096 | BUDGET_EXCEED | 2 | 0 | 0x000009D7
+31100 | STEP_START | 2 | 1 | -
+33353 | STEP_END | 2 | 1 | 2250us
+33527 | BUDGET_EXCEED | 2 | 1 | 0x000008CA
+33596 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011B000 (virt 0xC011B000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello frc[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2436us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6657us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2219us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11312us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2199us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2561us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4760us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+388 | BOOT | 0 | 0 | -
+2504 | BOOT | 0 | 0 | 0x00007EC8
+3440 | BOOT | 0 | 0 | 0x0000C0DE
+9092 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+10040 | UNKNOWN | 100 | 8 | 0x00001388
+10396 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+10857 | UNKNOWN | 100 | 1 | 0x00000008
+11377 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+12032 | MEM_ALLOC | 1 | 0 | 0x00000001
+12142 | MEM_ALLOC | 1 | 0 | 0x00000001
+12206 | MEM_ALLOC | 1 | 0 | 0x00000001
+12252 | MEM_ALLOC | 1 | 0 | 0x00000001
+12309 | MEM_EXCEED | 1 | 0 | 0x00000014
+12509 | STATE_CHANGE | 1 | 0 | 0x00000001
+12530 | MEM_ALLOC | 1 | 0 | 0x00000001
+13116 | MEM_FREE | 1 | 0 | 0x00000001
+13129 | MEM_FREE | 1 | 0 | 0x00000001
+13139 | MEM_FREE | 1 | 0 | 0x00000001
+13146 | MEM_FREE | 1 | 0 | 0x00000001
+13153 | MEM_FREE | 1 | 0 | 0x00000001
+13334 | JOB_SUBMIT | 1 | 0 | 0x00000003
+13440 | STEP_START | 1 | 0 | -
+15914 | STEP_END | 1 | 0 | 2436us
+16340 | BUDGET_EXCEED | 1 | 0 | 0x00000984
+16478 | STEP_START | 1 | 1 | -
+23136 | STEP_END | 1 | 1 | 6657us
+23321 | BUDGET_EXCEED | 1 | 1 | 0x00001A01
+23337 | STEP_START | 1 | 2 | -
+25557 | STEP_END | 1 | 2 | 2219us
+25697 | BUDGET_EXCEED | 1 | 2 | 0x000008AB
+25793 | JOB_COMPLETE | 1 | 0 | -
+26632 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+26772 | MEM_ALLOC | 2 | 1 | 0x00000001
+26894 | MEM_ALLOC | 2 | 1 | 0x00000001
+26956 | MEM_EXCEED | 2 | 0 | 0x0000000C
+27407 | STATE_CHANGE | 2 | 0 | 0x00000001
+27409 | MEM_ALLOC | 2 | 1 | 0x00000001
+27612 | MEM_FREE | 2 | 1 | 0x00000001
+27620 | MEM_FREE | 2 | 1 | 0x00000001
+27627 | MEM_FREE | 2 | 1 | 0x00000001
+27739 | JOB_SUBMIT | 2 | 0 | 0x00000002
+27741 | STEP_START | 2 | 0 | -
+29941 | STEP_END | 2 | 0 | 2199us
+30092 | BUDGET_EXCEED | 2 | 0 | 0x00000897
+30094 | STEP_START | 2 | 1 | -
+32657 | STEP_END | 2 | 1 | 2561us
+32807 | BUDGET_EXCEED | 2 | 1 | 0x00000A01
+32874 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+[demo] timer ticks elapsed: 50 (expected ~50 at 100Hz)
+
+--- Round Robin Scheduler Demo ---
+[sched] initializing RR scheduler...
+[vmm] new user PD at phys 0x0011B000 (virt 0xC011B000)
+[vmm] kernel PD at phys 0x00101000 (virt 0xC0101000)
+[vmm] kernel_pd[768] = 0x000000E3, new_pd[768] = 0x000000E3
+SWCR3OK
+SWCR3OK
+[kmain] Scheduler active. Idle loop.
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+[USER] Hello from User Space!
+c[?7l[2J[0mSeaBIOS (version rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.org)
+
+
+iPXE (http://ipxe.org) 00:03.0 CA00 PCI2.10 PnP PMM+06FD1EC0+06F31EC0 CA00
+Press Ctrl-B to configure iPXE (PCI 00:03.0)...                                                                               
+
+
+Booting from Hard Disk...
+Boot failed: could not read the boot disk
+
+Booting from Floppy...
+Boot failed: could not read the boot disk
+
+Booting from DVD/CD...
+[0;30;47mWelcome to GRUB!
+
+[01;01H[0m[2J  Booting `ZENEDGE Kernel'[01;26H
+
+ZE>PSVMHH
+KM
+ZENEDGE kernel booting...
+AI + Edge Computing Kernel Playground
+
+[time] initializing time subsystem
+[time] using assumed 1000 MHz CPU frequency
+[time] init complete
+[trace] flight recorder initialized (256 event ring buffer)
+[pmm] initializing physical memory manager
+[pmm] mboot at 0x00010000, flags=0x00001A67
+[pmm] parsing memory map...
+[pmm] found 6 memory regions
+[pmm] kernel: phys 0x00100000 - 0x00118000
+[pmm] NUMA node 0: PFN 256-16496 (16216 free)
+[pmm] NUMA node 1: PFN 16496-32736 (16240 free)
+[pmm] total memory: 130944 KB (32736 pages)
+[pmm] free memory: 129824 KB (32456 pages)
+[pmm] init complete
+[vmm] initializing virtual memory manager
+[vmm] current page directory at 0x00101000
+[vmm] paging enabled, kernel at 0xC0000000 (boot mapped 128MB using PSE)
+[vmm] init complete
+[gdt] initializing GDT with TSS...
+[gdt] GDT loaded, TSS installed
+[idt] initializing IDT...
+[idt] IDT loaded with 32 exceptions + 16 IRQs + syscall
+[pic] remapping IRQs to vectors 32-47...
+[pic] PIC initialized, all IRQs masked
+[pit] configuring timer at 100 Hz
+[pit] timer configured, IRQ0 unmasked
+[kmain] enabling interrupts...
+[syscall] registering syscall handler on vector 128
+
+=== MEMORY MAP ===
+REGION | BASE       | LENGTH     | TYPE
+-------|------------|------------|------------
+0      | 0x00000000 | 0x0009FC00 | Available
+1      | 0x0009FC00 | 0x00000400 | Reserved
+2      | 0x000F0000 | 0x00010000 | Reserved
+3      | 0x00100000 | 0x07EE0000 | Available
+4      | 0x07FE0000 | 0x00020000 | Reserved
+5      | 0xFFFC0000 | 0x00040000 | Reserved
+
+=== NUMA TOPOLOGY ===
+Node 0: 64864 KB free / 64960 KB total
+Node 1: 64960 KB free / 64960 KB total
+=== END MAP ===
+
+[contracts] init
+[sched] init
+
+--- Demo 0: Tensor Metadata & Admission Control ---
+[test] Job memory metrics:
+  total_memory_kb: 12
+  peak_memory_kb: 8
+  pinned_memory_kb: 4
+[contracts] applying contract for job 100
+[contracts] priority=HIGH, node=1, cpu_budget=50000us, mem_budget=64KB
+[test] Admission check (generous budget):
+[admit] checking job 100 against contract for job 100
+[admit] job peak memory: 8KB, contract budget: 64KB
+[admit] estimated CPU: 5000us, budget: 50000us
+[admit] job 100 ADMITTED
+  result: OK
+[contracts] applying contract for job 101
+[contracts] priority=LOW, node=1, cpu_budget=1000us, mem_budget=4KB
+[test] Admission check (tight budget):
+[admit] checking job 100 against contract for job 101
+[admit] job peak memory: 8KB, contract budget: 4KB
+[admit] REJECTED: memory budget exceeded
+  result: REJECT_MEMORY
+
+--- Demo 1: REALTIME priority job (node 0) ---
+[contracts] applying contract for job 1
+[contracts] priority=REALTIME, node=0, cpu_budget=5000us, mem_budget=16KB
+[test] allocating 5 pages via contract...
+  page 0 @ node 0
+  page 1 @ node 0
+  page 2 @ node 0
+  page 3 @ node 0
+[contracts] job 1 state: OK -> WARNED
+  page 4 @ node 0
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=20/16KB
+[test] freeing pages...
+[sched] run_job begin (budget: 5000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2465us (limit: 1666us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 6665us (limit: 1666us)
+[sched] executing step 2
+[sched] BUDGET EXCEED: step 2 took 2570us (limit: 1666us)
+[sched] no ready steps left
+[sched] run_job end - 3 steps, 11700us CPU, 3 violations
+
+--- Demo 2: LOW priority job (node 1) ---
+[contracts] applying contract for job 2
+[contracts] priority=LOW, node=1, cpu_budget=3000us, mem_budget=8KB
+[test] allocating 3 pages via LOW contract...
+  page 0 @ node 1
+  page 1 @ node 1
+[contracts] job 2 state: OK -> WARNED
+  page 2 @ node 1
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=12/8KB
+[sched] run_job begin (budget: 3000us)
+[sched] executing step 0
+[sched] BUDGET EXCEED: step 0 took 2257us (limit: 1500us)
+[sched] executing step 1
+[sched] BUDGET EXCEED: step 1 took 2378us (limit: 1500us)
+[sched] no ready steps left
+[sched] run_job end - 2 steps, 4635us CPU, 2 violations
+
+--- Final Contract States ---
+[contracts] Job 1: state=WARNED, cpu=0/5000us, mem=0/16KB
+[contracts] Job 2: state=WARNED, cpu=0/3000us, mem=0/8KB
+
+=== FLIGHT RECORDER DUMP ===
+TIME(us)     | TYPE             | JOB  | STEP | EXTRA
+-------------|------------------|------|------|--------
+500 | BOOT | 0 | 0 | -
+2801 | BOOT | 0 | 0 | 0x00007EC8
+4131 | BOOT | 0 | 0 | 0x0000C0DE
+11221 | CONTRACT_APPLY | 100 | 0 | 0x0000C350
+12661 | UNKNOWN | 100 | 8 | 0x00001388
+13135 | CONTRACT_APPLY | 101 | 0 | 0x000003E8
+13767 | UNKNOWN | 100 | 1 | 0x00000008
+14472 | CONTRACT_APPLY | 1 | 0 | 0x00001388
+15168 | MEM_ALLOC | 1 | 0 | 0x00000001
+15302 | MEM_ALLOC | 1 | 0 | 0x00000001
+15385 | MEM_ALLOC | 1 | 0 | 0x00000001
+15447 | MEM_ALLOC | 1 | 0 | 0x00000001
+15520 | MEM_EXCEED | 1 | 0 | 0x00000014
+15757 | STATE_CHANGE | 1 | 0 | 0x00000001
+15778 | MEM_ALLOC | 1 | 0 | 0x00000001
+16465 | MEM_FREE | 1 | 0 | 0x00000001
+16478 | MEM_FREE | 1 | 0 | 0x00000001
+16485 | MEM_FREE | 1 | 0 | 0x00000001
+16492 | MEM_FREE | 1 | 0 | 0x00000001
+16499 | MEM_FREE | 1 | 0 | 0x00000001
+16721 | JOB_SUBMIT | 1 | 0 | 0x00000003
+16824 | STEP_START | 1 | 0 | -
+19325 | STEP_END | 1 | 0 | 2465us
+19755 | BUDGET_EXCEED | 1 | 0 | 0x000009A1
+19886 | STEP_START | 1 | 1 | -
+26554 | STEP_END | 1 | 1 | 6665us
+26822 | BUDGET_EXCEED | 1 | 1 | 0x00001A09
+26840 | STEP_START | 1 | 2 | -
+29412 | STEP_END | 1 | 2 | 2570us
+29623 | BUDGET_EXCEED | 1 | 2 | 0x00000A0A
+29756 | JOB_COMPLETE | 1 | 0 | -
+30945 | CONTRACT_APPLY | 2 | 0 | 0x00000BB8
+31123 | MEM_ALLOC | 2 | 1 | 0x00000001
+31269 | MEM_ALLOC | 2 | 1 | 0x00000001
+31348 | MEM_EXCEED | 2 | 0 | 0x0000000C
+31829 | STATE_CHANGE | 2 | 0 | 0x00000001
+31831 | MEM_ALLOC | 2 | 1 | 0x00000001
+32143 | MEM_FREE | 2 | 1 | 0x00000001
+32154 | MEM_FREE | 2 | 1 | 0x00000001
+32161 | MEM_FREE | 2 | 1 | 0x00000001
+32316 | JOB_SUBMIT | 2 | 0 | 0x00000002
+32319 | STEP_START | 2 | 0 | -
+34577 | STEP_END | 2 | 0 | 2257us
+34776 | BUDGET_EXCEED | 2 | 0 | 0x000008D1
+34779 | STEP_START | 2 | 1 | -
+37159 | STEP_END | 2 | 1 | 2378us
+37382 | BUDGET_EXCEED | 2 | 1 | 0x0000094A
+37482 | JOB_COMPLETE | 2 | 0 | -
+=== END DUMP (48 events) ===
+
+
+--- Interrupt System Demo ---
+[demo] waiting ~500ms for timer ticks...
+qemu-system-i386: terminating on signal 15 from pid 24280 (<unknown process>)

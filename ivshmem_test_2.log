@@ -1,0 +1,1 @@
+qemu-system-i386: -device ivshmem-plain,memdev=hostmem: 'ivshmem-plain' is not a valid device model name
