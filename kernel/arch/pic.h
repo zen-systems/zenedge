@@ -42,6 +42,10 @@
 /* Initialize the PICs and remap IRQs */
 void pic_init(void);
 
+#include "idt.h" /* For interrupt_handler_t */
+/* Register an IRQ handler (0-15) */
+void irq_register_handler(uint8_t irq, interrupt_handler_t handler);
+
 /* Send End of Interrupt signal */
 void pic_send_eoi(uint8_t irq);
 

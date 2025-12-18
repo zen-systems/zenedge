@@ -68,3 +68,23 @@ uint64_t __udivmoddi4(uint64_t n, uint64_t d, uint64_t *rem) {
     if (rem) *rem = n - q * d;
     return q;
 }
+
+/* 64-bit signed division */
+int64_t __divdi3(int64_t n, int64_t d) {
+    int n_neg = (n < 0);
+    int d_neg = (d < 0);
+    uint64_t abs_n = n_neg ? -n : n;
+    uint64_t abs_d = d_neg ? -d : d;
+    uint64_t q = __udivdi3(abs_n, abs_d);
+    return (n_neg ^ d_neg) ? -(int64_t)q : (int64_t)q;
+}
+
+/* 64-bit signed modulo */
+int64_t __moddi3(int64_t n, int64_t d) {
+    int n_neg = (n < 0);
+    int d_neg = (d < 0);
+    uint64_t abs_n = n_neg ? -n : n;
+    uint64_t abs_d = d_neg ? -d : d;
+    uint64_t r = __umoddi3(abs_n, abs_d);
+    return n_neg ? -(int64_t)r : (int64_t)r;
+}

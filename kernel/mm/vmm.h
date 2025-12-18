@@ -39,6 +39,7 @@ typedef uint32_t vaddr_t;
 #define PTE_CACHE_DISABLE   (1 << 4)    /* Disable caching */
 #define PTE_ACCESSED        (1 << 5)    /* Page was accessed (set by CPU) */
 #define PTE_DIRTY           (1 << 6)    /* Page was written (set by CPU) */
+#define PTE_PSE             (1 << 7)    /* Page Size Extension (4MB page) */
 #define PTE_GLOBAL          (1 << 8)    /* Global page (not flushed on CR3 reload) */
 
 /* Common flag combinations */

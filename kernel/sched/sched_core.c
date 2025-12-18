@@ -9,8 +9,9 @@
 #include "../trace/flightrec.h"
 #include "../ipc/ipc.h"
 #include "../ipc/ipc_proto.h"
-#include "../drivers/ivshmem.h"
 #include "../arch/pit.h"
+#include "../include/string.h"
+#include "sched_core.h"
 
 /* Helper to print uint in sched */
 /* Now using global console helpers print_uint and print_hex32 */
@@ -199,261 +200,123 @@ void sched_run_job(sched_job_ctx_t *ctx) {
 }
 
 /* Scheduler Data */
-static process_t *process_list = NULL;
-static process_t *current_process = NULL;
+process_t *process_list = NULL;
+process_t *current_process = NULL;
 static uint32_t next_pid = 1;
 
 /* External Switch Function */
 extern void switch_to(process_t *curr, process_t *next);
-extern void enter_user_mode(void *entry_point, void *user_stack);
-
-/* Create a new process */
-process_t *sched_create_process(void (*entry_point)(void)) {
-  /* 1. Allocate Process Struct */
-  paddr_t p_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
-  if (!p_phys)
-    return NULL;
-
-  /* Using the physical page as kernel memory - primitive but works for now */
-  process_t *proc = (process_t *)(phys_to_virt(p_phys));
-
-  proc->pid = next_pid++;
-  proc->ticks_remaining = 5; /* 50ms quantum */
-  proc->state = PROCESS_STATE_READY;
-
-  /* 2. Create Page Directory */
-  proc->cr3 = vmm_create_user_pd();
-  if (!proc->cr3) {
-    pmm_free_page(p_phys);
-    return NULL;
-  }
-
-  /* 3. Allocate Kernel Stack */
-  /* We allocate 1 page for kernel stack */
-  paddr_t kstack_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
-  proc->kstack_top = phys_to_virt(kstack_phys) + 4096;
-
-  /*
-   * 4. Set up Stack for Context Switch
-   * We need to forge a stack that looks like 'switch_to' just saved it.
-   * switch_to pops: EDI, ESI, EBX, EBP, then RET.
-   */
-
-  /* Simplified: We assume 'entry_point' IS the kernel wrapper if needed,
-   * OR we treat this as a kernel thread for now.
-   *
-   * Let's make 'sched_create_user_process' specifically.
-   */
-
-  return proc;
-}
-
-process_t *sched_create_user_process(vaddr_t entry, vaddr_t stack_top) {
-  process_t *proc = sched_create_process(NULL);
-  if (!proc)
-    return NULL;
-
-  /*
-   * For user process, the "kernel thread" that starts it needs to:
-   * 1. Be running on the new kernel stack.
-   * 2. Call enter_user_mode(entry, stack_top).
-   *
-   * We forge the kernel stack to look like:
-   * [ ... ]
-   * [RET ADDR ] -> enter_user_mode
-   * [ARG 2    ] -> stack_top
-   * [ARG 1    ] -> entry
-   * [Garbage  ] -> (saved EBP, EBX, ESI, EDI)
-   */
-
-  uint32_t *sp = (uint32_t *)proc->kstack_top;
-
-  /* Arguments for enter_user_mode (pushed right-to-left if called, but here we
-   * setup stack frame) */
-  /* When 'switch_to' returns, it does 'ret'. ESP points to return address.
-   * Arguments are at ESP+4, ESP+8.
-   */
-
-  *(--sp) = stack_top; /* Arg 2 */
-  *(--sp) = entry;     /* Arg 1 */
-  *(--sp) =
-      0; /* Fake Return Address (so enter_user_mode sees args at +4, +8) */
-  *(--sp) = (uint32_t)enter_user_mode; /* Return Address for switch_to */
-
-  /* Callee-saved regs popped by switch_to */
-  *(--sp) = 0; /* EBP */
-  *(--sp) = 0; /* EBX */
-  *(--sp) = 0; /* ESI */
-  *(--sp) = 0; /* EDI */
-
-  proc->esp = (uint32_t)sp;
-
-  /* Add to list */
-  if (!process_list) {
-    process_list = proc;
-    proc->next = proc; /* Circular */
-  } else {
-    proc->next = process_list->next;
-    process_list->next = proc;
-  }
-
-  return proc;
-}
 
 void schedule(void) {
-  if (!current_process)
-    return;
+    if (!current_process) return;
 
-  /* Decrement quantum */
-  if (current_process->ticks_remaining > 0) {
-    current_process->ticks_remaining--;
-    return;
-  }
+    /* Decrement quantum */
+    if (current_process->ticks_remaining > 0) {
+        current_process->ticks_remaining--;
+        return;
+    }
 
-  /* Reset quantum */
-  current_process->ticks_remaining = 5;
+    /* Reset quantum */
+    current_process->ticks_remaining = 5; // 50ms
 
-  /* Pick next */
-  process_t *next = current_process->next;
+    /* Round Robin: Find next READY process */
+    process_t *next = current_process->next;
+    
+    // Safety check for empty list
+    if (!next) return;
 
-  if (next == current_process)
-    return; /* Only one task */
+    // Iterate to find RUNNABLE/READY
+    // For MVP, simplistic: just take next. 
+    // Ideally check state == READY/RUNNING.
+    
+    if (next == current_process) return; /* Only one task */
 
-  /* Switch */
-  process_t *prev = current_process;
-  current_process = next;
+    process_t *prev = current_process;
+    current_process = next;
 
-  switch_to(prev, next);
+    // State transition
+    if (prev->state == PROCESS_STATE_RUNNING) {
+        prev->state = PROCESS_STATE_READY;
+    }
+    current_process->state = PROCESS_STATE_RUNNING;
+
+    switch_to(prev, next);
 }
 
-/* Temporary: Init scheduler with a dummy kernel process (idle) and a user
- * process */
+/* 
+ * MVP Test: Create 2 processes yielding to each other 
+ */
 void sched_test_rr(void) {
-  console_write("[sched] initializing RR scheduler...\n");
+    console_write("[sched] initializing Process Model MVP...\n");
 
-  /* 1. Create access for current execution (Idle Task) */
-  paddr_t p_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
-  process_t *idle = (process_t *)(phys_to_virt(p_phys));
-  idle->pid = 0;
-  idle->state = PROCESS_STATE_RUNNING;
-  idle->ticks_remaining = 5;
-  /* We don't know the exact stack top or CR3, but switch_to will overwrite them
-   * into 'idle' structure. CR3 is read from register. ESP is read from
-   * register.
-   */
-  idle->next = idle;
+    /* 1. Create Idle/Kernel Process (PID 0) */
+    paddr_t p_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
+    process_t *idle = (process_t *)(phys_to_virt(p_phys));
+    memset(idle, 0, sizeof(process_t));
+    idle->pid = 0;
+    idle->state = PROCESS_STATE_RUNNING;
+    idle->ticks_remaining = 5;
+    
+    // Circular list
+    idle->next = idle;
+    process_list = idle;
+    current_process = idle;
+    
+    console_write("[sched] Idle process created. Now creating User Process...\n");
 
-  process_list = idle;
-  current_process = idle;
-
-  /* 2. Create User Process (Infinite Loop A) */
-  /* Allocate code page */
-  paddr_t code_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
-  vaddr_t user_code = 0x40000000;
-  /* We need to temporarily map it to copy data, but for simplicity:
-   * We map it in the *current* PD, copy data, and then when we create user PD,
-   * we rely on vmm_create_user_pd to NOT copy it, so we must map it manually
-   * there.
-   *
-   * actually let's map it in current kernel (identity) to write, then map in
-   * user.
-   */
-
-  /* 4. Copy "shellcode" to user memory
-   * We want to do:
-   *   while(1) {
-   *     sys_log("Hello User!"); // eax=1, ebx=msg
-   *     sys_yield();            // eax=2
-   *   }
-   *
-   * Assembly:
-   * start:
-   *   mov $1, %eax      ; sys_log
-   *   mov $0x40000100, %ebx ; msg address (offset 0x100 into page)
-   *   int $0x80
-   *   mov $2, %eax      ; sys_yield
-   *   int $0x80
-   *   jmp start
-   *
-   * Machine Code:
-   *   B8 01 00 00 00       mov eax, 1
-   *   BB 00 01 00 40       mov ebx, 0x40000100
-   *   CD 80                int 0x80
-   *   B8 02 00 00 00       mov eax, 2
-   *   CD 80                int 0x80
-   *   EB EB                jmp start (-21 bytes? need to calculate jump)
-   */
-  /* 4. Copy "shellcode" to user memory
-   * We want to do:
-   *   while(1) {
-   *     sys_log("Hello User!"); // eax=1, ebx=msg
-   *     sys_yield();            // eax=2
-   *   }
-   */
-  uint8_t *code_ptr = (uint8_t *)phys_to_virt(code_phys);
-
-  /* msg at 0x40000100 */
-  const char *msg = "Hello from User Space!";
-  uint8_t *msg_ptr = code_ptr + 0x100;
-  for (int i = 0; msg[i]; i++)
-    msg_ptr[i] = msg[i];
-  msg_ptr[22] = 0;
-
-  int i = 0;
-  code_ptr[i++] = 0xB8;
-  code_ptr[i++] = 0x01;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00; /* mov eax, 1 */
-  code_ptr[i++] = 0xBB;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x01;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x40; /* mov ebx, 0x40000100 */
-  code_ptr[i++] = 0xCD;
-  code_ptr[i++] = 0x80; /* int 0x80 */
-
-  /* Log */
-  code_ptr[i++] = 0xB8;
-  code_ptr[i++] = 0x01;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00; /* mov eax, 1 */
-  code_ptr[i++] = 0xBB;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x01;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x40; /* mov ebx, msg */
-  code_ptr[i++] = 0xCD;
-  code_ptr[i++] = 0x80; /* int 0x80 */
-
-  /* Yield */
-  code_ptr[i++] = 0xB8;
-  code_ptr[i++] = 0x02;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00;
-  code_ptr[i++] = 0x00; /* mov eax, 2 */
-  code_ptr[i++] = 0xCD;
-  code_ptr[i++] = 0x80; /* int 0x80 */
-
-  /* Loop: jmp start (-21) */
-  code_ptr[i++] = 0xEB;
-  code_ptr[i++] = 0xEB; /* -21 = 0xEB */
-
-  /* Clear any trailing bytes if needed (not needed as we jump) */
-
-  /* Create process */
-  /* Note: sched_create_user_process creates a PD. We must map execution pages
-   * into it. */
-  process_t *proc = sched_create_user_process(user_code, 0xB0000000);
-
-  /* Map code and stack in the NEW process's PD */
-  paddr_t old_pd = vmm_get_current_pd();
-  vmm_switch_pd(proc->cr3);
-
-  vmm_map_page(user_code, code_phys, PTE_USER_RW); // Code
-  paddr_t stack_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
-  vmm_map_page(0xB0000000 - 0x1000, stack_phys, PTE_USER_RW); // Stack
-
-  vmm_switch_pd(old_pd);
+    /* 2. Create User Process (Infinite Loop with Syscalls) */
+    /* Allocate and Map Code Page manually for shellcode */
+    paddr_t code_phys = pmm_alloc_page(NUMA_NODE_LOCAL);
+    vaddr_t user_code = 0x40000000;
+    
+    /* Write Shellcode to Physical Page */
+    uint8_t *code_ptr = (uint8_t *)phys_to_virt(code_phys);
+    
+    /* Shellcode:
+     * loop:
+     *   mov eax, 1 (log)
+     *   mov ebx, msg
+     *   int 0x80
+     *   mov eax, 2 (yield)
+     *   int 0x80
+     *   jmp loop
+     */
+    const char *msg = "Hello from Process 1!";
+    uint8_t *msg_ptr = code_ptr + 0x100;
+    strcpy((char*)msg_ptr, msg);
+    
+    int i = 0;
+    /* mov eax, 1 */
+    code_ptr[i++] = 0xB8; code_ptr[i++] = 0x01; code_ptr[i++] = 0x00; code_ptr[i++] = 0x00; code_ptr[i++] = 0x00;
+    /* mov ebx, 0x40000100 */
+    code_ptr[i++] = 0xBB; code_ptr[i++] = 0x00; code_ptr[i++] = 0x01; code_ptr[i++] = 0x00; code_ptr[i++] = 0x40;
+    /* int 0x80 */
+    code_ptr[i++] = 0xCD; code_ptr[i++] = 0x80;
+    
+    /* mov eax, 2 (yield) */
+    code_ptr[i++] = 0xB8; code_ptr[i++] = 0x02; code_ptr[i++] = 0x00; code_ptr[i++] = 0x00; code_ptr[i++] = 0x00;
+    /* int 0x80 */
+    code_ptr[i++] = 0xCD; code_ptr[i++] = 0x80;
+    
+    /* jmp -21 (loop) */
+    code_ptr[i++] = 0xEB; code_ptr[i++] = 0xEB;
+    
+    /* Create Process */
+    process_t *proc1 = sched_create_user_process(user_code, 0, 0);
+    
+    if (proc1) {
+        /* Map the code page into the new process's PD */
+        paddr_t current_pd = vmm_get_current_pd();
+        vmm_switch_pd(proc1->cr3);
+        
+        vmm_map_page(user_code, code_phys, PTE_USER_RW);
+        // Stack was mapped in sched_create_user_process
+        
+        vmm_switch_pd(current_pd);
+        
+        /* Add to List */
+        proc1->next = process_list->next;
+        process_list->next = proc1;
+        proc1->state = PROCESS_STATE_READY;
+    }
 }

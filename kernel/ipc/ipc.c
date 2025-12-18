@@ -119,7 +119,7 @@ void ipc_init(void *base_addr, uint8_t irq) {
     print_uint(32 + irq);
     console_write("\n");
 
-    idt_register_handler(32 + irq, ipc_irq_handler);
+    irq_register_handler(irq, ipc_irq_handler);
     pic_unmask_irq(irq);
   } else {
     console_write("[ipc] Warning: Invalid IRQ, polling mode only.\n");

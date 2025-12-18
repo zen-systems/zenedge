@@ -61,24 +61,25 @@ void vmm_init(void) {
 
     /* Get current page directory from CR3 */
     current_pd_phys = read_cr3() & 0xFFFFF000;
+    page_directory_t *pd = (page_directory_t *)phys_to_virt(current_pd_phys);
 
     console_write("[vmm] current page directory at ");
     print_hex32(current_pd_phys);
     console_write("\n");
 
-    /* At this point, boot code has set up:
-     * - PDE 0: Identity map for low memory (4MB, using 4MB PSE page)
-     * - PDE 768-799: Kernel mapping at 0xC0000000 (128MB using 4MB PSE pages)
-     *
-     * This allows phys_to_virt() to work for any address 0-128MB.
+    /* 
+     * Explicitly map 128MB of kernel memory (0xC0000000 - 0xC8000000)
+     * using 4MB PSE pages, matching the bootloader's work.
+     * Use entries 768-799 (32 entries * 4MB = 128MB).
      */
+    for (int i = 0; i < 32; i++) {
+        paddr_t paddr = i * 0x400000; // 4MB increments
+        pd->entries[KERNEL_VBASE_PDE + i] = MAKE_PTE(paddr, PTE_PRESENT | PTE_WRITABLE | PTE_PSE | PTE_GLOBAL);
+    }
 
-    console_write("[vmm] paging enabled, kernel at ");
-    print_hex32(KERNEL_VBASE);
-    console_write(" (boot mapped 128MB using PSE)\n");
+    console_write("[vmm] paging enabled, kernel mapped 128MB@0xC0000000 (PSE)\n");
 
     flightrec_log(TRACE_EVT_BOOT, 0, 0, 0xC0DE);  /* VMM initialized marker */
-
     console_write("[vmm] init complete\n");
 }
 
@@ -290,6 +291,11 @@ void vmm_destroy_user_pd(paddr_t pd_phys) {
     /* Free user-space page tables and pages */
     for (uint32_t pde_idx = 0; pde_idx < KERNEL_VBASE_PDE; pde_idx++) {
         if (pd->entries[pde_idx] & PTE_PRESENT) {
+            /* Skip large pages (PSE) - we don't treat them as page tables */
+            if (pd->entries[pde_idx] & PTE_PSE) {
+                continue;
+            }
+
             paddr_t pt_phys = PTE_ADDR(pd->entries[pde_idx]);
             page_table_t *pt = (page_table_t *)phys_to_virt(pt_phys);
 

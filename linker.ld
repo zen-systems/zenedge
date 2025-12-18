@@ -29,7 +29,7 @@ SECTIONS {
     .boot ALIGN(4K) : {
         _boot_start = .;
         *(.multiboot)           /* Multiboot header must be first */
-        boot/start.o(.text)     /* Boot code */
+        *boot/start.o(.text)    /* Boot code (allow for out-of-tree OBJDIR) */
         . = ALIGN(4K);
         _boot_end = .;
     }
@@ -39,7 +39,7 @@ SECTIONS {
      */
     .boot_bss ALIGN(4K) (NOLOAD) : {
         _boot_bss_start = .;
-        boot/start.o(.bss)      /* Boot BSS (page tables, stack) */
+        *boot/start.o(.bss)     /* Boot BSS (page tables, stack) */
         . = ALIGN(4K);
         _boot_bss_end = .;
     }
