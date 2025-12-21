@@ -1,8 +1,10 @@
 ARCH ?= i386
 
+
 CC = clang
 LD = ld
 AS = clang
+CXX = clang++
 GRUB_MKRESCUE ?= grub-mkrescue
 QEMU_UEFI ?= qemu-system-x86_64
 OVMF_CODE ?= /usr/share/OVMF/OVMF_CODE_4M.fd
@@ -17,6 +19,9 @@ ifeq ($(ARCH),i386)
   TARGET  = -target i386-unknown-none-elf
   CFLAGS  = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
             -fno-builtin -fno-stack-protector -mno-red-zone -m32
+  CXXFLAGS = $(TARGET) -std=c++17 -ffreestanding -O2 -Wall -Wextra \
+             -fno-builtin -fno-stack-protector -fno-exceptions -fno-rtti \
+             -mno-red-zone -m32
   ASFLAGS = $(TARGET) -m32
   LDFLAGS = -T linker.ld -nostdlib -m elf_i386
   GRUB_MULTIBOOT_CMD = multiboot
@@ -26,6 +31,10 @@ else ifeq ($(ARCH),x86_64)
   CFLAGS  = $(TARGET) -std=gnu99 -ffreestanding -O2 -Wall -Wextra \
             -fno-builtin -fno-stack-protector -fno-pic -mno-red-zone -m64 \
             -mcmodel=kernel
+  CXXFLAGS = $(TARGET) -std=c++17 -ffreestanding -O2 -Wall -Wextra \
+             -fno-builtin -fno-stack-protector -fno-exceptions -fno-rtti \
+             -fno-pic -mno-red-zone -m64 -mcmodel=kernel \
+             -Ikernel/include
   ASFLAGS = $(TARGET) -m64
   LDFLAGS = -T arch/x86_64/linker.ld -nostdlib -m elf_x86_64
   GRUB_MULTIBOOT_CMD = multiboot2
@@ -39,6 +48,8 @@ ifeq ($(ARCH),i386)
   SOURCES = kernel/kmain.c \
       kernel/console.c \
       kernel/contracts.c \
+      kernel/api/oracle.c \
+      kernel/api/contract_registry.c \
       kernel/zenedge_alloc.c \
       kernel/time/time.c \
       kernel/trace/flightrec.c \
@@ -60,10 +71,13 @@ ifeq ($(ARCH),i386)
       kernel/ipc/heap.c \
       kernel/lib/divdi3.c \
       kernel/lib/math.c \
+      kernel/lib/sha256.c \
       kernel/lib/libc.c \
       kernel/lib/string.c \
       kernel/mm/kheap.c \
       kernel/wasm_loader.c \
+      kernel/wasm/host_funcs.c \
+      kernel/trace/ifr.c \
       kernel/lib/wasm3/m3_core.c \
       kernel/lib/wasm3/m3_env.c \
       kernel/lib/wasm3/m3_code.c \
@@ -76,12 +90,22 @@ ifeq ($(ARCH),i386)
       kernel/lib/wasm3/m3_bind.c
 else ifeq ($(ARCH),x86_64)
   # Milestone M0: minimal long-mode bring-up (keeps i386 intact)
-  SOURCES = kernel/kmain64.c
+  SOURCES = kernel/kmain64.cpp kernel/lib/cpp_runtime.cpp kernel/lib/onnx/stub.cpp kernel/mm/kheap.c \
+            kernel/arch/x86_64/apic.c kernel/arch/pci.c kernel/drivers/ivshmem.c kernel/arch/idt.c \
+            kernel/arch/pic.c \
+            kernel/ipc/ipc.c kernel/ipc/heap.c kernel/wasm_loader.c kernel/wasm/host_funcs.c \
+            kernel/api/oracle.c kernel/api/contract_registry.c \
+            kernel/lib/libc.c kernel/lib/string.c kernel/lib/math.c kernel/time/time.c \
+            kernel/lib/divdi3.c kernel/lib/sha256.c kernel/trace/ifr.c \
+            kernel/lib/wasm3/m3_core.c kernel/lib/wasm3/m3_env.c kernel/lib/wasm3/m3_code.c \
+            kernel/lib/wasm3/m3_compile.c kernel/lib/wasm3/m3_exec.c kernel/lib/wasm3/m3_function.c \
+            kernel/lib/wasm3/m3_info.c kernel/lib/wasm3/m3_module.c kernel/lib/wasm3/m3_parse.c \
+            kernel/lib/wasm3/m3_bind.c
 endif
 
 # WASM3 Flags
-# Disabled Float for first pass to avoid libm deps
-WASM_FLAGS = -Dd_m3HasFloat=0 -Dd_m3FixedHeap=0 -Dd_m3Use32Bit=1 \
+# Enable Float (requires libm stubs)
+WASM_FLAGS = -Dd_m3HasFloat=1 -Dd_m3FixedHeap=0 -Dd_m3Use32Bit=1 \
              -Dd_m3LogOutput=0 -Dd_m3VerboseErrorMessages=1 \
              -Dmalloc=kmalloc -Dfree=kfree -Drealloc=krealloc \
              -nostdinc -Ikernel/include \
@@ -89,6 +113,8 @@ WASM_FLAGS = -Dd_m3HasFloat=0 -Dd_m3FixedHeap=0 -Dd_m3Use32Bit=1 \
 
 # Include WASM_FLAGS in CFLAGS (i386 kernel currently builds wasm3 in-tree)
 ifeq ($(ARCH),i386)
+  CFLAGS += $(WASM_FLAGS)
+else ifeq ($(ARCH),x86_64)
   CFLAGS += $(WASM_FLAGS)
 endif
 
@@ -101,18 +127,28 @@ ifeq ($(ARCH),i386)
 else ifeq ($(ARCH),x86_64)
   SRC_S = \
       arch/x86_64/boot/multiboot2_header.s \
-      arch/x86_64/boot/start.s
+      arch/x86_64/boot/start.s \
+      arch/x86_64/boot/isr.s
 endif
 
 all: zenedge.iso
 iso: zenedge.iso
 
 OBJDIR := build/$(ARCH)
-OBJ := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o) $(SRC_S:.s=.o))
+# Handle both .c and .cpp files for SOURCES - generate .o paths properly
+OBJ := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
+# For C++ files, swap extension first
+OBJ := $(patsubst %.cpp,%.o,$(OBJ))
+# Add assembly objects
+OBJ += $(addprefix $(OBJDIR)/,$(SRC_S:.s=.o))
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.s
 	@mkdir -p $(dir $@)
@@ -161,6 +197,8 @@ run-serial-uefi: zenedge.iso $(OVMF_VARS_COPY)
 		-drive if=pflash,format=raw,readonly=on,file=$(OVMF_CODE) \
 		-drive if=pflash,format=raw,file=$(OVMF_VARS_COPY) \
 		-cdrom zenedge.iso \
+		-object memory-backend-file,size=4M,share=on,mem-path=/dev/shm/ivshmem,id=ivshmem \
+		-device ivshmem-plain,memdev=ivshmem \
 		-nographic
 
 # Direct kernel boot (no ISO required)

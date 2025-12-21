@@ -44,6 +44,15 @@ unsigned long long strtoull(const char *nptr, char **endptr, int base) {
     return (unsigned long long)strtoul(nptr, endptr, base);
 }
 
+double strtod(const char *nptr, char **endptr) {
+    /* Minimal stub: only integer part */
+    double res = 0.0;
+    /* TODO: Parse properly if needed. For now, assuming int-like floats logic isn't critical for core execution. */
+    /* Check for 0.0 */
+    res = (double)strtoul(nptr, endptr, 10);
+    return res;
+}
+
 /* printf stub - minimal support */
 /* We won't implement full formatting yet, just pass string or hex */
 int printf(const char *format, ...) {

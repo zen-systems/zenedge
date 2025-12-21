@@ -16,14 +16,25 @@ from typing import Tuple
 # 0x08000 - 0x0FFFF: Response ring (32KB)   - Linux -> ZENEDGE
 # 0x10000 - 0x100FF: Doorbell control (256B) - Interrupt signaling
 # 0x10100 - 0x10FFF: Heap control block (~4KB)
-# 0x11000 - 0xFFFFF: Heap data region (~956KB for tensors/models)
+# 0x11000 - 0xFDFFF: Heap data region (~948KB for tensors/models)
+# 0xFE000 - 0xFEFFF: OBS ring (streaming)
+# 0xFF000 - 0xFFFFF: ACTION ring (streaming)
 
 IPC_CMD_RING_OFFSET  = 0x00000
 IPC_RSP_RING_OFFSET  = 0x08000
 IPC_DOORBELL_OFFSET  = 0x10000
 IPC_HEAP_CTL_OFFSET  = 0x10100
 IPC_HEAP_DATA_OFFSET = 0x11000
-IPC_HEAP_DATA_SIZE   = 0xEF000  # ~956KB
+IPC_HEAP_DATA_SIZE   = 0xED000  # ~948KB (reserve tail for stream rings)
+
+# Streaming obs/action rings (SPSC)
+IPC_STREAM_MAGIC     = 0x5354524D  # "STRM"
+IPC_OBS_RING_BYTES   = 0x1000
+IPC_ACT_RING_BYTES   = 0x1000
+IPC_OBS_RING_OFFSET  = IPC_HEAP_DATA_OFFSET + IPC_HEAP_DATA_SIZE
+IPC_ACT_RING_OFFSET  = IPC_OBS_RING_OFFSET + IPC_OBS_RING_BYTES
+IPC_OBS_RING_SIZE    = 64
+IPC_ACT_RING_SIZE    = 64
 
 IPC_SHARED_MEM_SIZE  = 0x100000  # 1MB total
 
@@ -53,6 +64,25 @@ CMD_PRINT     = 0x0002
 CMD_RUN_MODEL = 0x0010
 CMD_ENV_RESET = 0x0100
 CMD_ENV_STEP  = 0x0101
+CMD_IFR_PERSIST = 0x0200
+CMD_ARB_EPISODE = 0x0201
+CMD_TELEMETRY_POLL = 0x0300
+
+# CMD_ENV_RESET payload flags
+ENV_RESET_FLAG_STREAM = 0x00000001
+
+# CMD_ENV_STEP payload encoding (single-trip control loop)
+# [31:16] = ack blob id, [15:0] = action
+ENV_STEP_ACTION_MASK = 0x0000FFFF
+ENV_STEP_ACK_SHIFT = 16
+
+def env_step_pack(action: int, ack_blob_id: int) -> int:
+    return ((ack_blob_id & 0xFFFF) << ENV_STEP_ACK_SHIFT) | (action & ENV_STEP_ACTION_MASK)
+
+def env_step_unpack(payload: int) -> Tuple[int, int]:
+    action = payload & ENV_STEP_ACTION_MASK
+    ack_blob_id = (payload >> ENV_STEP_ACK_SHIFT) & 0xFFFF
+    return action, ack_blob_id
 
 # Command names for logging
 CMD_NAMES = {
@@ -61,6 +91,9 @@ CMD_NAMES = {
     CMD_RUN_MODEL: "RUN_MODEL",
     CMD_ENV_RESET: "ENV_RESET",
     CMD_ENV_STEP: "ENV_STEP",
+    CMD_IFR_PERSIST: "IFR_PERSIST",
+    CMD_ARB_EPISODE: "ARB_EPISODE",
+    CMD_TELEMETRY_POLL: "TELEMETRY_POLL",
 }
 
 # =============================================================================
@@ -177,6 +210,33 @@ PACKET_SIZE = PACKET_STRUCT.size  # 16 bytes
 RESPONSE_FMT = '<HHIQ'
 RESPONSE_STRUCT = struct.Struct(RESPONSE_FMT)
 RESPONSE_SIZE = RESPONSE_STRUCT.size  # 16 bytes
+
+# Streaming ring entries
+# obs_entry_t: seq, obs[4], reward, done, model_id
+OBS_ENTRY_FMT = '<I4ffff'
+OBS_ENTRY_STRUCT = struct.Struct(OBS_ENTRY_FMT)
+OBS_ENTRY_SIZE = OBS_ENTRY_STRUCT.size  # 32 bytes
+
+# action_entry_t: seq, action, flags, ack_seq, reserved
+ACT_ENTRY_FMT = '<IHHII'
+ACT_ENTRY_STRUCT = struct.Struct(ACT_ENTRY_FMT)
+ACT_ENTRY_SIZE = ACT_ENTRY_STRUCT.size  # 16 bytes
+
+# IFR record (136 bytes)
+IFR_MAGIC = 0x30465249  # "IFR0"
+IFR_VERSION = 2
+IFR_PROFILE_MAX = 16
+# magic, version, flags, job_id, episode_id, model_id, record_size, ts_usec,
+# goodput, profile_len, reserved, profile[16], hash[32]
+IFR_FMT = '<IHHIIIIQfHH16f32s'
+IFR_STRUCT = struct.Struct(IFR_FMT)
+IFR_SIZE = IFR_STRUCT.size
+IFR_HASH_OFFSET = IFR_SIZE - 32
+
+# Telemetry snapshot
+TELEMETRY_FMT = '<Qfff'
+TELEMETRY_STRUCT = struct.Struct(TELEMETRY_FMT)
+TELEMETRY_SIZE = TELEMETRY_STRUCT.size
 
 # Doorbell control block (256 bytes)
 # typedef struct {

@@ -57,4 +57,7 @@ int pci_find_device(uint16_t vendor_id, uint16_t device_id,
 /* type_out: 0=start_addr, 1=size */
 uint32_t pci_get_bar(pci_device_t dev, int bar_index, uint32_t *size_out);
 
+/* Enable MSI */
+int pci_enable_msi(pci_device_t dev, uint8_t vector, uint8_t dest_id);
+
 #endif /* _ARCH_PCI_H */

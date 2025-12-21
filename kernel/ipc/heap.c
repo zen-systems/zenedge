@@ -392,9 +392,44 @@ void *heap_get_tensor_data(uint16_t blob_id) {
   if (!blob || blob->type != BLOB_TYPE_TENSOR)
     return NULL;
 
+  /* ABI Verify: Magic matches */
+  if (blob->magic != BLOB_MAGIC) { 
+      console_write("[heap] Security: Invalid magic in blob header\n");
+      return NULL;
+  }
+
+  /* ABI Verify: Bounds check */
+  if (blob->offset + blob->size > IPC_HEAP_DATA_SIZE) {
+      console_write("[heap] Security: Blob data out of bounds\n");
+      return NULL;
+  }
+  
   void *data = heap_get_data(blob_id);
   if (!data)
     return NULL;
+  
+  if (blob->size < sizeof(tensor_header_t)) {
+      console_write("[heap] Security: Blob too small for tensor header\n");
+      return NULL;
+  }
+  
+  /* Verify Tensor Header */
+  tensor_header_t *hdr = (tensor_header_t *)data;
+  if (hdr->ndim > 4) {
+       console_write("[heap] Security: Invalid ndim\n");
+       return NULL;
+  }
+  
+  /* Validate data size matches shape */
+  uint32_t expected_size = sizeof(tensor_header_t);
+  uint32_t nelems = 1;
+  for(int i=0; i<hdr->ndim; i++) nelems *= hdr->shape[i];
+  expected_size += nelems * dtype_size(hdr->dtype);
+  
+  if (expected_size > blob->size) {
+      console_write("[heap] Security: Tensor shape exceeds blob size\n");
+      return NULL;
+  }
 
   /* Skip tensor header */
   return (uint8_t *)data + sizeof(tensor_header_t);

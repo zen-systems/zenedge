@@ -11,5 +11,6 @@ void abort(void);
 int abs(int j);
 unsigned long strtoul(const char *nptr, char **endptr, int base);
 unsigned long long strtoull(const char *nptr, char **endptr, int base);
+double strtod(const char *nptr, char **endptr);
 
 #endif

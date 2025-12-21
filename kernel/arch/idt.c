@@ -73,6 +73,19 @@ extern void irq15(void);
 extern void isr128(void);
 
 /* Set an IDT entry */
+/* Set an IDT entry */
+#if defined(__x86_64__)
+static void idt_set_entry(int index, uint64_t handler, uint16_t selector,
+                          uint8_t type_attr) {
+    idt[index].offset_low  = handler & 0xFFFF;
+    idt[index].selector    = selector;
+    idt[index].ist         = 0;
+    idt[index].type_attr   = type_attr;
+    idt[index].offset_mid  = (handler >> 16) & 0xFFFF;
+    idt[index].offset_high = (handler >> 32) & 0xFFFFFFFF;
+    idt[index].reserved    = 0;
+}
+#else
 static void idt_set_entry(int index, uint32_t handler, uint16_t selector,
                           uint8_t type_attr) {
     idt[index].offset_low  = handler & 0xFFFF;
@@ -81,6 +94,7 @@ static void idt_set_entry(int index, uint32_t handler, uint16_t selector,
     idt[index].zero        = 0;
     idt[index].type_attr   = type_attr;
 }
+#endif
 
 /* Exception names for debugging */
 static const char *exception_names[] = {
@@ -138,6 +152,14 @@ static void default_exception_handler(interrupt_frame_t *frame) {
     print_hex(frame->err_code);
     console_write("\n");
 
+#if defined(__x86_64__)
+    /* Simplified dump for 64-bit */
+    console_write("  RIP: ");
+    /* print_hex32 truncates, need print_hex64 but reusing existing for now */
+    print_hex(frame->rip >> 32);
+    print_hex(frame->rip & 0xFFFFFFFF);
+    console_write("\n");
+#else
     console_write("  EIP: ");
     print_hex(frame->eip);
     console_write("  CS: ");
@@ -182,6 +204,7 @@ static void default_exception_handler(interrupt_frame_t *frame) {
         else console_write("kernel ");
         console_write("\n");
     }
+#endif
 
     /* Halt */
     console_write("\nSystem halted.\n");
@@ -212,7 +235,11 @@ void idt_init(void) {
 
     /* Set up IDT pointer */
     idt_ptr.limit = sizeof(idt) - 1;
+#if defined(__x86_64__)
+    idt_ptr.base  = (uint64_t)&idt;
+#else
     idt_ptr.base  = (uint32_t)&idt;
+#endif
 
     /* Clear handlers array */
     for (int i = 0; i < IDT_ENTRIES; i++) {
@@ -222,62 +249,62 @@ void idt_init(void) {
     /* CPU exceptions (0-31) - interrupt gates (interrupts disabled) */
     uint8_t exc_attr = IDT_ATTR_PRESENT | IDT_ATTR_RING0 | IDT_GATE_INT32;
 
-    idt_set_entry(0,  (uint32_t)isr0,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(1,  (uint32_t)isr1,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(2,  (uint32_t)isr2,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(3,  (uint32_t)isr3,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(4,  (uint32_t)isr4,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(5,  (uint32_t)isr5,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(6,  (uint32_t)isr6,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(7,  (uint32_t)isr7,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(8,  (uint32_t)isr8,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(9,  (uint32_t)isr9,  GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(10, (uint32_t)isr10, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(11, (uint32_t)isr11, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(12, (uint32_t)isr12, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(13, (uint32_t)isr13, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(14, (uint32_t)isr14, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(15, (uint32_t)isr15, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(16, (uint32_t)isr16, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(17, (uint32_t)isr17, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(18, (uint32_t)isr18, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(19, (uint32_t)isr19, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(20, (uint32_t)isr20, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(21, (uint32_t)isr21, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(22, (uint32_t)isr22, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(23, (uint32_t)isr23, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(24, (uint32_t)isr24, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(25, (uint32_t)isr25, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(26, (uint32_t)isr26, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(27, (uint32_t)isr27, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(28, (uint32_t)isr28, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(29, (uint32_t)isr29, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(30, (uint32_t)isr30, GDT_KERNEL_CODE_SEG, exc_attr);
-    idt_set_entry(31, (uint32_t)isr31, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(0,  (uintptr_t)isr0,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(1,  (uintptr_t)isr1,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(2,  (uintptr_t)isr2,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(3,  (uintptr_t)isr3,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(4,  (uintptr_t)isr4,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(5,  (uintptr_t)isr5,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(6,  (uintptr_t)isr6,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(7,  (uintptr_t)isr7,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(8,  (uintptr_t)isr8,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(9,  (uintptr_t)isr9,  GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(10, (uintptr_t)isr10, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(11, (uintptr_t)isr11, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(12, (uintptr_t)isr12, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(13, (uintptr_t)isr13, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(14, (uintptr_t)isr14, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(15, (uintptr_t)isr15, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(16, (uintptr_t)isr16, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(17, (uintptr_t)isr17, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(18, (uintptr_t)isr18, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(19, (uintptr_t)isr19, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(20, (uintptr_t)isr20, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(21, (uintptr_t)isr21, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(22, (uintptr_t)isr22, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(23, (uintptr_t)isr23, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(24, (uintptr_t)isr24, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(25, (uintptr_t)isr25, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(26, (uintptr_t)isr26, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(27, (uintptr_t)isr27, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(28, (uintptr_t)isr28, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(29, (uintptr_t)isr29, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(30, (uintptr_t)isr30, GDT_KERNEL_CODE_SEG, exc_attr);
+    idt_set_entry(31, (uintptr_t)isr31, GDT_KERNEL_CODE_SEG, exc_attr);
 
     /* Hardware IRQs (32-47) */
     uint8_t irq_attr = IDT_ATTR_PRESENT | IDT_ATTR_RING0 | IDT_GATE_INT32;
 
-    idt_set_entry(32, (uint32_t)irq0,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(33, (uint32_t)irq1,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(34, (uint32_t)irq2,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(35, (uint32_t)irq3,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(36, (uint32_t)irq4,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(37, (uint32_t)irq5,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(38, (uint32_t)irq6,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(39, (uint32_t)irq7,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(40, (uint32_t)irq8,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(41, (uint32_t)irq9,  GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(42, (uint32_t)irq10, GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(43, (uint32_t)irq11, GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(44, (uint32_t)irq12, GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(45, (uint32_t)irq13, GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(46, (uint32_t)irq14, GDT_KERNEL_CODE_SEG, irq_attr);
-    idt_set_entry(47, (uint32_t)irq15, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(32, (uintptr_t)irq0,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(33, (uintptr_t)irq1,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(34, (uintptr_t)irq2,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(35, (uintptr_t)irq3,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(36, (uintptr_t)irq4,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(37, (uintptr_t)irq5,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(38, (uintptr_t)irq6,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(39, (uintptr_t)irq7,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(40, (uintptr_t)irq8,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(41, (uintptr_t)irq9,  GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(42, (uintptr_t)irq10, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(43, (uintptr_t)irq11, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(44, (uintptr_t)irq12, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(45, (uintptr_t)irq13, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(46, (uintptr_t)irq14, GDT_KERNEL_CODE_SEG, irq_attr);
+    idt_set_entry(47, (uintptr_t)irq15, GDT_KERNEL_CODE_SEG, irq_attr);
 
     /* Syscall interrupt (0x80 = 128) - trap gate, accessible from ring 3 */
     uint8_t syscall_attr = IDT_ATTR_PRESENT | IDT_ATTR_RING3 | IDT_GATE_TRAP32;
-    idt_set_entry(INT_SYSCALL, (uint32_t)isr128, GDT_KERNEL_CODE_SEG, syscall_attr);
+    idt_set_entry(INT_SYSCALL, (uintptr_t)isr128, GDT_KERNEL_CODE_SEG, syscall_attr);
 
     /* Load IDT */
     idt_flush(&idt_ptr);

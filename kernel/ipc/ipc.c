@@ -32,6 +32,10 @@ static void *ipc_shmem_base = NULL;
 static volatile ipc_ring_t *cmd_ring = NULL;
 static volatile ipc_rsp_ring_t *rsp_ring = NULL;
 static volatile doorbell_ctl_t *doorbell = NULL;
+static volatile stream_ring_t *obs_ring = NULL;
+static volatile stream_ring_t *act_ring = NULL;
+static volatile obs_entry_t *obs_entries = NULL;
+static volatile action_entry_t *act_entries = NULL;
 
 /* Statistics */
 static uint32_t irq_count = 0;
@@ -111,6 +115,9 @@ void ipc_init(void *base_addr, uint8_t irq) {
   /* Initialize Heap */
   heap_init((void *)(base + IPC_HEAP_CTL_OFFSET));
 
+  /* Initialize Streaming Rings */
+  ipc_stream_init();
+
   /* Register Interrupt Handler */
   /* IRQ is the ISA IRQ number (e.g. 11) */
   /* IDT vector = IRQ_BASE (32) + irq */
@@ -124,6 +131,71 @@ void ipc_init(void *base_addr, uint8_t irq) {
   } else {
     console_write("[ipc] Warning: Invalid IRQ, polling mode only.\n");
   }
+}
+
+void ipc_stream_init(void) {
+  if (!ipc_shmem_base)
+    return;
+
+  uint8_t *base = (uint8_t *)ipc_shmem_base;
+  obs_ring = (stream_ring_t *)(base + IPC_OBS_RING_OFFSET);
+  act_ring = (stream_ring_t *)(base + IPC_ACT_RING_OFFSET);
+  obs_entries = (obs_entry_t *)((uint8_t *)obs_ring + sizeof(stream_ring_t));
+  act_entries = (action_entry_t *)((uint8_t *)act_ring + sizeof(stream_ring_t));
+
+  if (obs_ring->magic != IPC_STREAM_MAGIC) {
+    obs_ring->magic = IPC_STREAM_MAGIC;
+    obs_ring->head = 0;
+    obs_ring->tail = 0;
+    obs_ring->size = IPC_OBS_RING_SIZE;
+  }
+
+  if (act_ring->magic != IPC_STREAM_MAGIC) {
+    act_ring->magic = IPC_STREAM_MAGIC;
+    act_ring->head = 0;
+    act_ring->tail = 0;
+    act_ring->size = IPC_ACT_RING_SIZE;
+  }
+}
+
+int ipc_stream_ready(void) {
+  return obs_ring && act_ring &&
+         obs_ring->magic == IPC_STREAM_MAGIC &&
+         act_ring->magic == IPC_STREAM_MAGIC;
+}
+
+int ipc_stream_action_push(uint32_t seq, uint16_t action, uint32_t ack_seq) {
+  if (!act_ring || !act_entries || act_ring->magic != IPC_STREAM_MAGIC)
+    return -1;
+
+  uint32_t head = act_ring->head;
+  uint32_t next = (head + 1) % act_ring->size;
+  if (next == act_ring->tail)
+    return -1;
+
+  act_entries[head].seq = seq;
+  act_entries[head].action = action;
+  act_entries[head].flags = 0;
+  act_entries[head].ack_seq = ack_seq;
+  act_entries[head].reserved = 0;
+
+  __asm__ __volatile__("" ::: "memory");
+  act_ring->head = next;
+  return 0;
+}
+
+int ipc_stream_obs_pop(obs_entry_t *out) {
+  if (!obs_ring || !obs_entries || obs_ring->magic != IPC_STREAM_MAGIC || !out)
+    return 0;
+
+  uint32_t tail = obs_ring->tail;
+  if (tail == obs_ring->head)
+    return 0;
+
+  *out = obs_entries[tail];
+  __asm__ __volatile__("" ::: "memory");
+  obs_ring->tail = (tail + 1) % obs_ring->size;
+  return 1;
 }
 
 /* Ring the command doorbell to notify Linux */
@@ -268,6 +340,14 @@ int ipc_has_response(void) {
 int ipc_poll_response(ipc_response_t *rsp) {
   if (!rsp_ring || rsp_ring->magic != IPC_RSP_MAGIC)
     return 0;
+
+  /* Spin-wait optimization (reduce tail latency) */
+  /* Try to catch a response that arrives just after we called this, 
+   * avoiding a costly sleep in the caller. */
+  for (int i = 0; i < 5000; i++) {
+      if (rsp_ring->head != rsp_ring->tail) break;
+      __asm__ __volatile__("pause");
+  }
 
   uint32_t head = rsp_ring->head;
   uint32_t tail = rsp_ring->tail;
@@ -470,5 +550,4 @@ void ipc_dump_debug(void) {
 
   console_write("[ipc] === END DUMP ===\n");
 }
-
 

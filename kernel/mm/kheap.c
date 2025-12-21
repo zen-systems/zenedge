@@ -4,18 +4,30 @@
 
 #include "kheap.h"
 #include "../console.h"
+#include "../include/string.h"
 
 #define HEAP_MAGIC 0xC0FFEE42u
 #define ALIGN_UP(x, a)   (((x) + ((a)-1)) & ~((a)-1))
 #define ALIGN_DOWN(x, a) ((x) & ~((a)-1))
 
+/*
+ * Ensure 16-byte payload alignment on both i386 and x86_64.
+ * The header size itself must be a multiple of 16 so that:
+ * aligned_base + sizeof(header) == aligned_payload
+ */
 typedef struct block_header {
     uint32_t magic;
-    uint32_t size;              // payload size (bytes)
+    uint32_t is_free;
+    size_t   size;              // payload size (bytes)
     struct block_header* next;
     struct block_header* prev;
-    uint32_t is_free;
-} block_header_t;
+#if defined(__x86_64__)
+    uint64_t _pad0;   // x64: 4+4+8+8+8 = 32. +8 = 40. Aligned to 16 -> 48 bytes.
+#else
+    uint32_t _pad0;
+    uint32_t _pad1;   // i386: 4+4+4+4+4 = 20. +4+4 = 28. Aligned to 16 -> 32 bytes.
+#endif
+} __attribute__((aligned(16))) block_header_t;
 
 static block_header_t* heap_start = NULL;
 static uintptr_t heap_base = 0;
@@ -29,7 +41,7 @@ static int ptr_in_heap(void* p) {
 void kheap_init(void* start_addr, size_t size) {
     if (!start_addr) return;
 
-    // Align heap start to 16 for SIMD-friendly alignment (future ORT/wasm needs this).
+    // Align heap start to 16
     uintptr_t base = ALIGN_UP((uintptr_t)start_addr, 16);
     uintptr_t end  = (uintptr_t)start_addr + (uintptr_t)size;
     end = ALIGN_DOWN(end, 16);
@@ -41,31 +53,28 @@ void kheap_init(void* start_addr, size_t size) {
 
     heap_start = (block_header_t*)base;
     heap_start->magic = HEAP_MAGIC;
-    heap_start->size  = (uint32_t)(end - base - sizeof(block_header_t));
+    heap_start->size  = (size_t)(end - base - sizeof(block_header_t));
     heap_start->next  = NULL;
     heap_start->prev  = NULL;
     heap_start->is_free = 1;
 
-    console_write("[kheap] initialized at ");
-    print_hex32((uint32_t)heap_base);
-    console_write(" size: ");
-    print_uint((uint32_t)(heap_end - heap_base));
-    console_write(" bytes\n");
+    console_write("[kheap] initialized (aligned, 64-bit safe)\n");
 }
 
-static void split_block(block_header_t* b, uint32_t want) {
-    uint32_t remaining = b->size - want;
-    if (remaining <= (uint32_t)(sizeof(block_header_t) + 16)) return;
+static void split_block(block_header_t* b, size_t want) {
+    size_t remaining = b->size - want;
+    if (remaining <= (size_t)(sizeof(block_header_t) + 16)) return;
 
+    // Because 'b' is 16-aligned and sizeof(block_header_t) is 16-aligned,
+    // nb_addr is naturally 16-aligned. No explicit ALIGN_UP needed.
     uintptr_t nb_addr = (uintptr_t)b + sizeof(block_header_t) + want;
-    nb_addr = ALIGN_UP(nb_addr, 16);
-
+    
     block_header_t* nb = (block_header_t*)nb_addr;
     nb->magic = HEAP_MAGIC;
     nb->is_free = 1;
 
     uintptr_t b_payload_end = (uintptr_t)b + sizeof(block_header_t) + b->size;
-    uint32_t new_size = (uint32_t)(b_payload_end - (uintptr_t)nb - sizeof(block_header_t));
+    size_t new_size = (size_t)(b_payload_end - (uintptr_t)nb - sizeof(block_header_t));
 
     nb->size = new_size;
     nb->next = b->next;
@@ -80,7 +89,7 @@ static void split_block(block_header_t* b, uint32_t want) {
 void* kmalloc(size_t size) {
     if (!heap_start || size == 0) return NULL;
 
-    uint32_t want = (uint32_t)ALIGN_UP((uint32_t)size, 16);
+    size_t want = ALIGN_UP(size, 16);
 
     block_header_t* cur = heap_start;
     while (cur) {
@@ -97,24 +106,37 @@ void* kmalloc(size_t size) {
         cur = cur->next;
     }
 
-    console_write("[kheap] OOM! Requested ");
-    print_uint(want);
-    console_write("\n");
+    console_write("[kheap] OOM\n");
     return NULL;
 }
 
 static void coalesce(block_header_t* b) {
-    // merge forward
-    if (b->next && b->next->is_free && b->next->magic == HEAP_MAGIC) {
-        block_header_t* n = b->next;
-        b->size = b->size + (uint32_t)((uintptr_t)n - ((uintptr_t)b + sizeof(block_header_t))) + (uint32_t)sizeof(block_header_t) + n->size;
-        b->next = n->next;
-        if (b->next) b->next->prev = b;
+    if (!b) return;
+    if (!ptr_in_heap(b) || b->magic != HEAP_MAGIC) return;
+
+    /* If this is a free block, first walk backward to the start of the free run. */
+    if (b->is_free) {
+        while (b->prev && b->prev->is_free && b->prev->magic == HEAP_MAGIC) {
+            b = b->prev;
+        }
     }
 
-    // merge backward
-    if (b->prev && b->prev->is_free && b->prev->magic == HEAP_MAGIC) {
-        coalesce(b->prev);
+    /* Merge forward repeatedly */
+    while (b->next && b->next->is_free && b->next->magic == HEAP_MAGIC) {
+        block_header_t* n = b->next;
+
+        uintptr_t payload_start = (uintptr_t)b + sizeof(block_header_t);
+        uintptr_t next_end = (uintptr_t)n + sizeof(block_header_t) + (uintptr_t)n->size;
+
+        if (next_end <= payload_start || next_end > heap_end) {
+            console_write("[kheap] CORRUPTION (bad coalesce)\n");
+            break;
+        }
+
+        size_t merged_payload = (size_t)(next_end - payload_start);
+        b->size = merged_payload;
+        b->next = n->next;
+        if (b->next) b->next->prev = b;
     }
 }
 
@@ -144,10 +166,9 @@ void* krealloc(void* ptr, size_t new_size) {
     block_header_t* h = (block_header_t*)((uintptr_t)ptr - sizeof(block_header_t));
     if (h->magic != HEAP_MAGIC) return NULL;
 
-    uint32_t want = (uint32_t)ALIGN_UP((uint32_t)new_size, 16);
+    size_t want = ALIGN_UP(new_size, 16);
     if (h->size >= want) return ptr;
 
-    // Try in-place grow: if next is free and enough space, merge then split
     if (h->next && h->next->is_free && h->next->magic == HEAP_MAGIC) {
         coalesce(h);
         if (h->size >= want) {
@@ -160,10 +181,10 @@ void* krealloc(void* ptr, size_t new_size) {
     void* np = kmalloc(want);
     if (!np) return NULL;
 
-    // copy old payload
+    // manual memcpy
     uint8_t* s = (uint8_t*)ptr;
     uint8_t* d = (uint8_t*)np;
-    for (uint32_t i = 0; i < h->size; i++) d[i] = s[i];
+    for (size_t i = 0; i < h->size; i++) d[i] = s[i];
 
     kfree(ptr);
     return np;

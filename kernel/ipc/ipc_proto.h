@@ -17,14 +17,30 @@
  * 0x08000 - 0x0FFFF: Response ring (32KB)   - Linux -> ZENEDGE
  * 0x10000 - 0x100FF: Doorbell control (256B) - Interrupt signaling
  * 0x10100 - 0x10FFF: Heap control block (~4KB)
- * 0x11000 - 0xFFFFF: Heap data region (~956KB for tensors/models)
+ * 0x11000 - 0xFDFFF: Heap data region (~948KB for tensors/models)
+ * 0xFE000 - 0xFEFFF: OBS ring (streaming)
+ * 0xFF000 - 0xFFFFF: ACTION ring (streaming)
  */
 #define IPC_CMD_RING_OFFSET  0x00000
 #define IPC_RSP_RING_OFFSET  0x08000
 #define IPC_DOORBELL_OFFSET  0x10000
 #define IPC_HEAP_CTL_OFFSET  0x10100
 #define IPC_HEAP_DATA_OFFSET 0x11000
-#define IPC_HEAP_DATA_SIZE   0xEF000  /* ~956KB */
+#define IPC_HEAP_DATA_SIZE   0xED000  /* ~948KB (reserve tail for stream rings) */
+
+/* =============================================================================
+ * STREAMING OBS/ACTION RINGS (SPSC)
+ * =============================================================================
+ * Placed at the tail of the shared memory region to avoid moving heap base.
+ */
+#define IPC_STREAM_MAGIC     0x5354524D  /* "STRM" */
+#define IPC_OBS_RING_BYTES   0x1000
+#define IPC_ACT_RING_BYTES   0x1000
+#define IPC_OBS_RING_OFFSET  (IPC_HEAP_DATA_OFFSET + IPC_HEAP_DATA_SIZE)
+#define IPC_ACT_RING_OFFSET  (IPC_OBS_RING_OFFSET + IPC_OBS_RING_BYTES)
+
+#define IPC_OBS_RING_SIZE    64
+#define IPC_ACT_RING_SIZE    64
 
 /* =============================================================================
  * DOORBELL MECHANISM - Low-latency interrupt signaling
@@ -85,6 +101,23 @@ typedef struct {
 #define CMD_RUN_MODEL 0x0010
 #define CMD_ENV_RESET 0x0100
 #define CMD_ENV_STEP  0x0101
+#define CMD_IFR_PERSIST 0x0200
+#define CMD_ARB_EPISODE 0x0201
+#define CMD_TELEMETRY_POLL 0x0300
+
+/* CMD_ENV_RESET payload flags */
+#define ENV_RESET_FLAG_STREAM 0x00000001u
+
+/* CMD_ENV_STEP payload encoding (single-trip control loop)
+ * [31:16] = ack blob id (uint16_t)
+ * [15:0]  = action (uint16_t)
+ */
+#define ENV_STEP_ACTION_MASK 0x0000FFFFu
+#define ENV_STEP_ACK_SHIFT   16
+#define ENV_STEP_PACK(action, ack_id) \
+  ((((uint32_t)(ack_id)) << ENV_STEP_ACK_SHIFT) | ((uint32_t)(action) & ENV_STEP_ACTION_MASK))
+#define ENV_STEP_UNPACK_ACTION(payload) ((uint16_t)((payload) & ENV_STEP_ACTION_MASK))
+#define ENV_STEP_UNPACK_ACK(payload)    ((uint16_t)((payload) >> ENV_STEP_ACK_SHIFT))
 
 /* Response IDs (0x8000-0xFFFF) - high bit set indicates response */
 #define RSP_OK        0x8000
@@ -131,6 +164,38 @@ typedef struct {
   uint32_t reserved[4]; /* Padding/Reserved */
   ipc_response_t data[];/* Ring Data */
 } ipc_rsp_ring_t;
+
+/* Stream ring header (same layout as command ring header) */
+typedef struct {
+  uint32_t magic;       /* IPC_STREAM_MAGIC */
+  uint32_t head;        /* Producer Index */
+  uint32_t tail;        /* Consumer Index */
+  uint32_t size;        /* Entry count */
+  uint32_t reserved[4]; /* Padding/Reserved */
+} stream_ring_t;
+
+typedef struct {
+  uint32_t seq;     /* Monotonic step id */
+  float    obs[4];  /* Observation vector */
+  float    reward;
+  float    done;
+  float    model_id;/* Blob id (float32 for compatibility) */
+} obs_entry_t;
+
+typedef struct {
+  uint32_t seq;     /* Matches obs seq */
+  uint16_t action;  /* Discrete action */
+  uint16_t flags;   /* Reserved */
+  uint32_t ack_seq; /* Optional ack of last obs */
+  uint32_t reserved;
+} action_entry_t;
+
+typedef struct __attribute__((packed)) {
+  uint64_t ts_usec;
+  float gpu_temp_c;
+  float rdma_qp_depth;
+  float numa_locality;
+} telemetry_snapshot_t;
 
 /* =============================================================================
  * SHARED HEAP - For passing tensor data between ZENEDGE and Linux

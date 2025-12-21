@@ -17,6 +17,12 @@ pdpt:
     .skip 4096
 pd:
     .skip 4096
+pd1:
+    .skip 4096
+pd2:
+    .skip 4096
+pd3:
+    .skip 4096
 
 .align 16
 boot_stack_bottom:
@@ -70,10 +76,32 @@ start:
     mov %eax, pdpt+0xFF0
     movl $0, pdpt+0xFF4
 
-    /* Identity-map 0..1GiB using 2MiB pages in PD */
+    /* pdpt[1] -> pd1 (1GB-2GB) */
+    mov $pd1, %eax
+    or $(PTE_P | PTE_W), %eax
+    mov %eax, pdpt+8
+    movl $0, pdpt+12
+
+    /* pdpt[2] -> pd2 (2GB-3GB) */
+    mov $pd2, %eax
+    or $(PTE_P | PTE_W), %eax
+    mov %eax, pdpt+16
+    movl $0, pdpt+20
+
+    /* pdpt[3] -> pd3 (3GB-4GB) */
+    mov $pd3, %eax
+    or $(PTE_P | PTE_W), %eax
+    mov %eax, pdpt+24
+    movl $0, pdpt+28
+
+    /* Identity-map 0..4GiB using 2MiB pages */
+    /* We assume pd, pd1, pd2, pd3 are contiguous in BSS (aligned) */
+    /* Each PD is 4096 bytes. Total 4 * 4096 = 16384 bytes */
+    /* Total 2048 entries */
+    
     mov $pd, %edi
-    xor %eax, %eax                  /* base physical */
-    mov $512, %ecx                  /* 512 * 2MiB = 1GiB */
+    xor %eax, %eax                  /* base physical 0 */
+    mov $2048, %ecx                 /* 2048 * 2MiB = 4GiB */
 1:
     mov %eax, %edx
     or $(PTE_P | PTE_W | PDE_PS), %edx
@@ -123,7 +151,7 @@ long_mode_entry:
     /* 16-byte align stack; keep SysV ABI alignment before call */
     mov $boot_stack_top, %rsp
     and $-16, %rsp
-    sub $8, %rsp
+    /* sub $8, %rsp <-- REMOVED */
 
     /* Prepare args: kmain64(uint32_t magic, uint32_t info_ptr) */
     mov mb2_magic(%rip), %edi
@@ -139,7 +167,17 @@ higher_half_entry:
     /* Switch to a higher-half stack */
     mov $kernel_stack_top, %rsp
     and $-16, %rsp
-    sub $8, %rsp
+    /* sub $8, %rsp  <-- REMOVED: Breaks ABI alignment (rsp should be 16-byte aligned BEFORE call) */
+    
+    /* Enable SSE (Required for x86_64 GCC generated code) */
+    mov %cr0, %rax
+    and $0xFFFB, %ax  /* Clear EM (bit 2) */
+    or  $0x0002, %ax  /* Set MP (bit 1) */
+    mov %rax, %cr0
+    
+    mov %cr4, %rax
+    or  $0x0600, %rax /* Set OSFXSR (bit 9) and OSXMMEXCPT (bit 10) */
+    mov %rax, %cr4
 
     .extern kmain64
     call kmain64

@@ -6,6 +6,10 @@
 #include "ipc_proto.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Initialize the shared heap (called from ipc_init) */
 void heap_init(void *heap_base);
 
@@ -67,5 +71,9 @@ uint32_t heap_get_blob_phys(uint16_t blob_id);
 
 /* Get size of a blob's data */
 uint32_t heap_get_blob_size(uint16_t blob_id);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IPC_HEAP_H */

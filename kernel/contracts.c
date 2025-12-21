@@ -40,6 +40,8 @@ void contract_apply(task_contract_t *c) {
   c->mem_violations = 0;
   c->state = CONTRACT_STATE_OK;
 
+  contract_register(c);
+
   /* Set preferred node based on priority */
   if (c->prio == CONTRACT_PRIORITY_REALTIME) {
     c->preferred_node = NUMA_NODE_LOCAL; /* Node 0 for latency */

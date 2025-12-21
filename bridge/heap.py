@@ -192,14 +192,29 @@ class HeapManager:
         element_size = DTYPE_SIZES[tensor_header.dtype]
         data_size = num_elements * element_size
 
-        # Read tensor data
-        tensor_data = self.shm.read(data_size)
-
-        # Create numpy array
-        arr = np.frombuffer(tensor_data, dtype=numpy_dtype)
-        arr = arr.reshape(tensor_header.shape)
-
-        return arr
+        # Read tensor data (Zero-Copy)
+        start = self.data_offset + offset + BLOB_HEADER_SIZE + TENSOR_HEADER_SIZE
+        end = start + data_size
+        
+        # Create a view directly into the mmap
+        # Note: numpy.frombuffer with mmap or memoryview creates a read-only array sharing memory
+        try:
+             # Use memoryview to slice without copy
+             mem_view = memoryview(self.shm)[start:end]
+             arr = np.frombuffer(mem_view, dtype=numpy_dtype)
+             arr = arr.reshape(tensor_header.shape)
+             
+             # Don't copy unless necessary (e.g. if we need to write to it and mmap is RO? 
+             # mmap is usually RW. BUT np.frombuffer might return read-only if source is.
+             # We want zero-copy read for inference input.)
+             return arr
+        except Exception as e:
+             print(f"[HEAP] Zero-copy read failed: {e}, falling back to copy")
+             self.shm.seek(start)
+             data = self.shm.read(data_size)
+             arr = np.frombuffer(data, dtype=numpy_dtype)
+             arr = arr.reshape(tensor_header.shape)
+             return arr
 
     def write_blob_data(self, blob_id: int, data: bytes) -> bool:
         """

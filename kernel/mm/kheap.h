@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Initialize Kernel Heap */
 void kheap_init(void *start_addr, size_t size);
 
@@ -15,5 +19,9 @@ void kfree(void *ptr);
 
 /* Stats */
 size_t kheap_free_size(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -92,6 +92,12 @@ const char* contract_state_name(contract_state_t state);
 /* Debug: print contract details */
 void contract_debug_print(const task_contract_t *c);
 
+/* Register contract for lookup (oracle adapter) */
+void contract_register(task_contract_t *c);
+
+/* Lookup contract by job id (for oracle adapters) */
+const task_contract_t *contract_lookup(uint32_t job_id);
+
 /* ========================================================================
  * Admission Control
  * ======================================================================== */

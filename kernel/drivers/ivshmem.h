@@ -10,6 +10,9 @@
 /* Returns the virtual address of the shared memory, or 0 if not found */
 void *ivshmem_get_shared_memory(void);
 
+/* Returns the size of the shared memory region (bytes) */
+uint32_t ivshmem_get_size(void);
+
 /* Detects and initializes the driver */
 void ivshmem_init(void);
 

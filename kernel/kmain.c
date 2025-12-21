@@ -85,54 +85,6 @@ void kmain(multiboot_info_t *mboot_info) {
   /* Initialize Kernel Mesh */
   ipc_mesh_init();
 
-  /* Test IPC: send command to Real Bridge */
-  console_write("\n--- IPC Inference Demo ---\n");
-
-  /* 1. Allocate input tensor (1x28x28 float32 for MNIST) */
-  uint32_t input_shape[] = {1, 28, 28};
-  uint16_t input_tensor = heap_alloc_tensor(DTYPE_FLOAT32, 3, input_shape);
-  console_write("[test] Allocated input tensor: id=");
-  print_uint(input_tensor);
-  console_write("\n");
-
-  /* 2. Fill with dummy data */
-  float *input_data = (float *)heap_get_tensor_data(input_tensor);
-  if (input_data) {
-      for(int i=0; i<28*28; i++) input_data[i] = 0.5f;
-  }
-
-  /* 3. Send Run Model Command */
-  console_write("[test] Sending CMD_RUN_MODEL...\n");
-  ipc_send(CMD_RUN_MODEL, input_tensor);
-
-  /* 4. Poll for response (timeout after ~5s) */
-  console_write("[test] Polling for response...\n");
-  
-  ipc_response_t rsp;
-  int timeout = 500; /* 500 * 10ms = 5s */
-  int received = 0;
-  
-  while(timeout > 0) {
-      if (ipc_poll_response(&rsp)) {
-          received = 1;
-          break;
-      }
-      pit_sleep_ms(10); /* Sleep 10ms */
-      timeout--;
-  }
-
-  if (received) {
-    console_write("[test] Got response! status=");
-    print_hex32(rsp.status);
-    console_write(" result_blob=");
-    print_hex32(rsp.result);
-    console_write("\n");
-  } else {
-    console_write("[test] Timeout waiting for response!\n");
-  }
-
-
-
   ipc_dump_debug();
 
   /* Test Shared Heap */
@@ -565,8 +517,9 @@ void kmain(multiboot_info_t *mboot_info) {
                 action = (i % 2);
             }
             
-            /* Send Action */
-            ipc_send(CMD_ENV_STEP, action);
+            /* Send Action + Ack previous obs blob */
+            uint32_t env_payload = ENV_STEP_PACK(action, (uint16_t)current_blob_id);
+            ipc_send(CMD_ENV_STEP, env_payload);
             
             /* Wait for Next State */
             ipc_response_t rsp;

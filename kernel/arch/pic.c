@@ -36,7 +36,9 @@ static volatile uint32_t timer_ticks = 0;
 static void timer_handler(interrupt_frame_t *frame) {
   (void)frame;
   timer_ticks++;
+#ifndef __x86_64__
   schedule();
+#endif
 }
 
 /* Register an IRQ handler */

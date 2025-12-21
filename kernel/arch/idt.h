@@ -63,7 +63,24 @@
 /* Software interrupt vectors */
 #define INT_SYSCALL            0x80  /* System call (128) */
 
-/* IDT entry structure (8 bytes) */
+/* IDT entry structure (8 bytes for 32-bit, 16 bytes for 64-bit) */
+#if defined(__x86_64__)
+typedef struct __attribute__((packed)) {
+    uint16_t offset_low;     /* Offset 0-15 */
+    uint16_t selector;       /* Segment Selector */
+    uint8_t  ist;            /* Interrupt Stack Table (0-7) | Reserved */
+    uint8_t  type_attr;      /* Type and Attributes */
+    uint16_t offset_mid;     /* Offset 16-31 */
+    uint32_t offset_high;    /* Offset 32-63 */
+    uint32_t reserved;       /* Reserved */
+} idt_entry_t;
+
+/* IDT pointer for LIDT instruction (10 bytes) */
+typedef struct __attribute__((packed)) {
+    uint16_t limit;          /* Size of IDT - 1 */
+    uint64_t base;           /* Linear address of IDT */
+} idt_ptr_t;
+#else
 typedef struct __attribute__((packed)) {
     uint16_t offset_low;     /* Handler offset bits 0-15 */
     uint16_t selector;       /* Code segment selector */
@@ -77,6 +94,7 @@ typedef struct __attribute__((packed)) {
     uint16_t limit;          /* Size of IDT - 1 */
     uint32_t base;           /* Linear address of IDT */
 } idt_ptr_t;
+#endif
 
 /* Gate types for type_attr field */
 #define IDT_GATE_TASK          0x05  /* Task gate (unused) */
@@ -91,6 +109,22 @@ typedef struct __attribute__((packed)) {
 #define IDT_ATTR_RING3         (3 << 5)  /* Ring 3 (user) - for syscalls */
 
 /* Interrupt stack frame pushed by CPU */
+/* Interrupt stack frame pushed by CPU */
+#if defined(__x86_64__)
+typedef struct __attribute__((packed)) {
+    /* Pushed by our ISR stub */
+    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
+    uint64_t rbp, rdi, rsi, rdx, rcx, rbx, rax;
+    uint64_t int_no;         /* Interrupt number */
+    uint64_t err_code;       /* Error code */
+    /* Pushed by CPU */
+    uint64_t rip;            /* Instruction pointer */
+    uint64_t cs;             /* Code segment */
+    uint64_t rflags;         /* Flags register */
+    uint64_t rsp;            /* Stack pointer */
+    uint64_t ss;             /* Stack segment */
+} interrupt_frame_t;
+#else
 typedef struct __attribute__((packed)) {
     /* Pushed by our ISR stub */
     uint32_t ds;             /* Data segment selector */
@@ -105,6 +139,7 @@ typedef struct __attribute__((packed)) {
     uint32_t user_esp;       /* User stack pointer */
     uint32_t user_ss;        /* User stack segment */
 } interrupt_frame_t;
+#endif
 
 /* Initialize IDT and install handlers */
 void idt_init(void);

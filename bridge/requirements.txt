@@ -1,3 +1,5 @@
 # ZENEDGE Bridge Dependencies
 numpy>=1.21.0
 torch>=2.0.0
+onnx>=1.14.0
+onnxruntime>=1.15.0

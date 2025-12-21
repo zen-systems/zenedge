@@ -1,6 +1,5 @@
 #include "keyboard.h"
 #include "../console.h"
-#include "idt.h"
 #include "pic.h"
 #include "scancodes.h"
 
@@ -18,9 +17,6 @@ static inline uint8_t inb(uint16_t port) {
   __asm__ __volatile__("inb %1, %0" : "=a"(ret) : "Nd"(port));
   return ret;
 }
-
-/* IRQ 1 is vector 33 (32 + 1) */
-#define IRQ1 33
 
 void keyboard_handler(interrupt_frame_t *regs) {
   (void)regs;
@@ -68,7 +64,7 @@ void keyboard_handler(interrupt_frame_t *regs) {
 
 void keyboard_init(void) {
   /* Register IRQ 1 handler */
-  idt_register_handler(IRQ1, keyboard_handler);
+  irq_register_handler(1, keyboard_handler);
 
   /* Unmask IRQ 1 (Keyboard) */
   pic_unmask_irq(1);

@@ -129,3 +129,71 @@ uint32_t pci_get_bar(pci_device_t dev, int bar_index, uint32_t *size_out) {
 
   return orig_val & 0xFFFFFFF0; /* Return base address (Memory) */
 }
+
+/* MSI Capability ID = 0x05 */
+#define PCI_CAP_ID_MSI 0x05
+
+int pci_enable_msi(pci_device_t dev, uint8_t vector, uint8_t dest_id) {
+    uint8_t status = pci_read_config_32(dev.bus, dev.slot, dev.func, PCI_REGISTER_STATUS) >> 16;
+    
+    if (!(status & 0x10)) {
+        console_write("[pci] Capabilities List not supported\n");
+        return -1;
+    }
+    
+    uint8_t cap_ptr = pci_read_config_32(dev.bus, dev.slot, dev.func, 0x34) & 0xFF;
+    
+    while (cap_ptr != 0) {
+        uint32_t cap_hdr = pci_read_config_32(dev.bus, dev.slot, dev.func, cap_ptr);
+        uint8_t cap_id = cap_hdr & 0xFF;
+        uint8_t next_cap = (cap_hdr >> 8) & 0xFF;
+        
+        if (cap_id == PCI_CAP_ID_MSI) {
+            console_write("[pci] Found MSI Capability at offset ");
+            print_hex32(cap_ptr);
+            console_write("\n");
+            
+            /* MSI Control Register at offset +2 */
+            /* 32-bit read at cap_ptr includes ID (0), Next (8), Control (16) */
+            uint16_t msi_ctl = (cap_hdr >> 16);
+            
+            /* 
+             * Address: 0xFEE00000 | (Dest << 12) 
+             * Data: Vector | Edge(0) | Fixed(0)
+             */
+            uint32_t addr = 0xFEE00000 | (dest_id << 12);
+            uint32_t data = vector;
+            
+            /* Message Address at cap_ptr + 4 */
+            pci_write_config_32(dev.bus, dev.slot, dev.func, cap_ptr + 4, addr);
+            
+            /* Message Upper Address at cap_ptr + 8 (if 64-bit supported) */
+            /* Check bit 7 of control for 64-bit capable */
+            int is_64bit = (msi_ctl & 0x0080);
+            
+            if (is_64bit) {
+                pci_write_config_32(dev.bus, dev.slot, dev.func, cap_ptr + 8, 0);
+                pci_write_config_32(dev.bus, dev.slot, dev.func, cap_ptr + 12, data);
+            } else {
+                pci_write_config_32(dev.bus, dev.slot, dev.func, cap_ptr + 8, data);
+            }
+            
+            /* Enable MSI (Bit 0 of Control) */
+            msi_ctl |= 0x1;
+            
+            /* Write back control (careful to preserve ID/Next bytes if writing 32-bit word) */
+            cap_hdr = (cap_hdr & 0xFFFF) | ((uint32_t)msi_ctl << 16);
+            pci_write_config_32(dev.bus, dev.slot, dev.func, cap_ptr, cap_hdr);
+            
+            console_write("[pci] MSI Enabled for vector ");
+            print_uint(vector);
+            console_write("\n");
+            return 0;
+        }
+        
+        cap_ptr = next_cap;
+    }
+    
+    console_write("[pci] MSI Capability not found\n");
+    return -1;
+}

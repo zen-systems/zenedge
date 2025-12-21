@@ -5,6 +5,7 @@
 #include "flightrec.h"
 #include "../console.h"
 #include "../time/time.h"
+#include "../include/string.h"
 
 /* Ring buffer */
 static trace_event_t buf[TRACE_BUF_SIZE];
@@ -82,8 +83,15 @@ void flightrec_log(trace_event_type_t type, uint32_t job_id,
     e->job_id    = job_id;
     e->step_id   = step_id;
     e->extra     = extra;
+    seal_episode((episode_t *)e);
 
     head++;
+}
+
+void seal_episode(episode_t *ep) {
+    if (!ep)
+        return;
+    memset(ep->tpm_signature, 0, sizeof(ep->tpm_signature));
 }
 
 trace_span_t flightrec_begin_span(trace_event_type_t start_type,

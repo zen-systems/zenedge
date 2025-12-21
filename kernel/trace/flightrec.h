@@ -85,9 +85,12 @@ typedef struct __attribute__((packed)) {
     uint32_t job_id;            /* Job identifier */
     uint32_t step_id;           /* Step identifier (or context-dependent) */
     uint32_t extra;             /* Duration (usec) or other context data */
+    uint8_t  tpm_signature[256];/* TPM quote/signature placeholder */
 } trace_event_t;
 
-_Static_assert(sizeof(trace_event_t) == 32, "trace_event_t must be 32 bytes");
+_Static_assert(sizeof(trace_event_t) == 288, "trace_event_t must be 288 bytes");
+
+typedef trace_event_t episode_t;
 
 /*
  * Summary statistics for quick contract checking
@@ -106,6 +109,8 @@ void flightrec_init(void);
 /* Log an event (fast path) */
 void flightrec_log(trace_event_type_t type, uint32_t job_id,
                    uint32_t step_id, uint32_t extra);
+
+void seal_episode(episode_t *ep);
 
 /*
  * Paired event logging for duration tracking

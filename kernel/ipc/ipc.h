@@ -7,6 +7,10 @@
 #include "ipc_proto.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Initialize IPC with a specific shared memory base address (virtual) and
  * IRQ vector */
 /* If base_addr is NULL, it fails */
@@ -41,5 +45,15 @@ void ipc_dump_debug(void);
 void ipc_mesh_init(void);
 void ipc_mesh_update(void);
 void ipc_mesh_dump(void);
+
+/* Streaming obs/action rings */
+void ipc_stream_init(void);
+int ipc_stream_ready(void);
+int ipc_stream_action_push(uint32_t seq, uint16_t action, uint32_t ack_seq);
+int ipc_stream_obs_pop(obs_entry_t *out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IPC_H */
