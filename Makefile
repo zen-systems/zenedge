@@ -1,11 +1,26 @@
-ARCH ?= i386
+ARCH ?= x86_64
 
+
+
+
+# Detect OS
+UNAME_S := $(shell uname -s)
 
 CC = clang
-LD = ld
 AS = clang
 CXX = clang++
+
+# Linker selection
+ifeq ($(UNAME_S),Darwin)
+  # macOS requires LLD to link ELF binaries (native ld is Mach-O)
+  LD = ld.lld
+else
+  # Linux: default to system linker (usually BFD/Gold, which supports ELF)
+  LD ?= ld
+endif
+
 GRUB_MKRESCUE ?= grub-mkrescue
+
 QEMU_UEFI ?= qemu-system-x86_64
 OVMF_CODE ?= /usr/share/OVMF/OVMF_CODE_4M.fd
 OVMF_VARS ?= /usr/share/OVMF/OVMF_VARS_4M.fd
@@ -69,6 +84,8 @@ ifeq ($(ARCH),i386)
       kernel/shell.c \
       kernel/ipc/ipc.c \
       kernel/ipc/heap.c \
+      kernel/engine/episode.c \
+      kernel/drivers/mock_gpu.c \
       kernel/lib/divdi3.c \
       kernel/lib/math.c \
       kernel/lib/sha256.c \
@@ -89,18 +106,27 @@ ifeq ($(ARCH),i386)
       kernel/lib/wasm3/m3_parse.c \
       kernel/lib/wasm3/m3_bind.c
 else ifeq ($(ARCH),x86_64)
-  # Milestone M0: minimal long-mode bring-up (keeps i386 intact)
-  SOURCES = kernel/kmain64.cpp kernel/lib/cpp_runtime.cpp kernel/lib/onnx/stub.cpp kernel/mm/kheap.c \
-            kernel/arch/x86_64/apic.c kernel/arch/pci.c kernel/drivers/ivshmem.c kernel/arch/idt.c \
-            kernel/arch/pic.c \
-            kernel/ipc/ipc.c kernel/ipc/heap.c kernel/wasm_loader.c kernel/wasm/host_funcs.c \
-            kernel/api/oracle.c kernel/api/contract_registry.c \
-            kernel/lib/libc.c kernel/lib/string.c kernel/lib/math.c kernel/time/time.c \
-            kernel/lib/divdi3.c kernel/lib/sha256.c kernel/trace/ifr.c \
-            kernel/lib/wasm3/m3_core.c kernel/lib/wasm3/m3_env.c kernel/lib/wasm3/m3_code.c \
-            kernel/lib/wasm3/m3_compile.c kernel/lib/wasm3/m3_exec.c kernel/lib/wasm3/m3_function.c \
-            kernel/lib/wasm3/m3_info.c kernel/lib/wasm3/m3_module.c kernel/lib/wasm3/m3_parse.c \
-            kernel/lib/wasm3/m3_bind.c
+  SOURCES = kernel/kmain.c \
+            kernel/console.c \
+            kernel/arch/pci.c \
+            kernel/drivers/ivshmem.c \
+            kernel/ipc/ipc.c \
+            kernel/ipc/heap.c \
+            kernel/engine/episode.c \
+            kernel/drivers/mock_gpu.c \
+            kernel/lib/string.c \
+            kernel/lib/libc.c \
+            kernel/lib/math.c \
+            kernel/lib/divdi3.c \
+            kernel/lib/sha256.c \
+            kernel/mm/pmm.c \
+            kernel/mm/kheap.c \
+            kernel/trace/flightrec.c \
+            kernel/time/time.c \
+            kernel/arch/x86_64/apic.c \
+            kernel/arch/x86_64/stubs.c
+
+
 endif
 
 # WASM3 Flags
@@ -109,7 +135,8 @@ WASM_FLAGS = -Dd_m3HasFloat=1 -Dd_m3FixedHeap=0 -Dd_m3Use32Bit=1 \
              -Dd_m3LogOutput=0 -Dd_m3VerboseErrorMessages=1 \
              -Dmalloc=kmalloc -Dfree=kfree -Drealloc=krealloc \
              -nostdinc -Ikernel/include \
-             -I/usr/lib/llvm-18/lib/clang/18/include
+             -I$(shell $(CC) -print-resource-dir)/include
+
 
 # Include WASM_FLAGS in CFLAGS (i386 kernel currently builds wasm3 in-tree)
 ifeq ($(ARCH),i386)

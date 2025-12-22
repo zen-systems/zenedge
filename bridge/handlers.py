@@ -20,7 +20,7 @@ from .protocol import (
     BLOB_TYPE_TENSOR,
     BLOB_TYPE_RESULT,
     BLOB_TYPE_RAW,
-    IFR_STRUCT,
+    IFR_V2_STRUCT,
     TELEMETRY_STRUCT,
     Packet,
 )
@@ -79,7 +79,7 @@ def handle_ifr_persist(bridge: 'ZenedgeBridge', packet: Packet) -> Tuple[int, in
         return RSP_ERROR, 0
 
     data = bridge.heap.read_blob_data(packet.payload_id)
-    if not data or len(data) < IFR_STRUCT.size:
+    if not data or len(data) < IFR_V2_STRUCT.size:
         print("[HANDLER] IFR_PERSIST: invalid blob data")
         return RSP_ERROR, 0
 
@@ -113,7 +113,8 @@ def handle_ifr_persist(bridge: 'ZenedgeBridge', packet: Packet) -> Tuple[int, in
     with open(base + ".json", "w", encoding="utf-8") as f:
         json.dump(record, f, indent=2, sort_keys=True)
     with open(base + ".bin", "wb") as f:
-        f.write(data[:IFR_STRUCT.size])
+        record_size = int(parsed.get("record_size", len(data)))
+        f.write(data[:record_size])
 
     if not hash_ok:
         print("[HANDLER] IFR_PERSIST: hash mismatch")
@@ -299,6 +300,8 @@ def register_all_handlers(bridge: 'ZenedgeBridge'):
     # Core commands
     bridge.register_handler(CMD_PING, handle_ping)
     bridge.register_handler(CMD_PRINT, handle_print)
+    bridge.register_handler(CMD_IFR_PERSIST, handle_ifr_persist)
+    bridge.register_handler(CMD_TELEMETRY_POLL, handle_telemetry_poll)
     bridge.register_handler(CMD_RUN_MODEL, handle_run_model)
 
     # Extended commands
@@ -310,6 +313,8 @@ def register_all_handlers(bridge: 'ZenedgeBridge'):
     print("[HANDLERS] Registered handlers:")
     print(f"  CMD_PING ({CMD_PING:#06x})")
     print(f"  CMD_PRINT ({CMD_PRINT:#06x})")
+    print(f"  CMD_IFR_PERSIST ({CMD_IFR_PERSIST:#06x})")
+    print(f"  CMD_TELEMETRY_POLL ({CMD_TELEMETRY_POLL:#06x})")
     print(f"  CMD_RUN_MODEL ({CMD_RUN_MODEL:#06x})")
     print(f"  CMD_TENSOR_ALLOC ({CMD_TENSOR_ALLOC:#06x})")
     print(f"  CMD_TENSOR_FREE ({CMD_TENSOR_FREE:#06x})")

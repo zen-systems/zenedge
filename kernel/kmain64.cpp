@@ -77,6 +77,8 @@ static void ipc_stash_response(const ipc_response_t *rsp) {
     }
 }
 
+static uint8_t g_last_chain_hash[32] = {0};
+
 /* Stub for VMM */
 extern "C" int vmm_map_range(uintptr_t virt, uint32_t phys, size_t size, int flags) {
     (void)virt; (void)phys; (void)size; (void)flags;
@@ -212,6 +214,7 @@ extern "C" void kmain64(uint32_t mb2_magic, uint32_t mb2_info_ptr) {
   const usec_t telemetry_ttl_usec = 5 * 1000000ULL;
   const usec_t telemetry_poll_usec = 1000000ULL;
   uint32_t loop_count = 0;
+  bool safemode = false;
   
   /* Wait for Reset Response */
   ipc_response_t rsp;
@@ -274,19 +277,15 @@ extern "C" void kmain64(uint32_t mb2_magic, uint32_t mb2_info_ptr) {
       if (done_bits > 0x3F000000) {
            log->log("Episode Done. Persisting IFR...");
 
-           uint32_t profile_id = 0;
-           uint16_t profile_len = 0;
-           const float *profile = wasm_get_profile(&profile_id, &profile_len);
-
-           ifr_record_t ifr;
-           ifr_build(&ifr, job_id, episode_id, model_id, profile, profile_len, episode_reward);
-           bool ifr_ok = (ifr_verify(&ifr) != 0);
+           ifr_record_v3_t ifr;
+           ifr_build_v3(&ifr, g_last_chain_hash, job_id, episode_id, model_id, episode_reward);
+           bool ifr_ok = (ifr_verify_v3(&ifr) != 0);
            if (!ifr_ok) {
                log->log("IFR verify failed. Skipping persist.");
            }
 
            if (ifr_ok) {
-               uint16_t ifr_blob = heap_alloc(sizeof(ifr_record_t), BLOB_TYPE_RAW);
+               uint16_t ifr_blob = heap_alloc(sizeof(ifr_record_v3_t), BLOB_TYPE_RAW);
                if (ifr_blob) {
                    void *dst = heap_get_data(ifr_blob);
                    if (dst) {
@@ -317,8 +316,31 @@ extern "C" void kmain64(uint32_t mb2_magic, uint32_t mb2_info_ptr) {
                                __asm__("pause");
                            }
 
-                           if (arb_rsp.status == RSP_OK && arb_rsp.result != 0) {
-                               log->log("Arbiter returned new model.");
+                           if (arb_rsp.status == RSP_OK) {
+                               uint16_t decision = (uint16_t)((arb_rsp.result >> 16) & 0xFFFF);
+                               uint16_t rec_model_id = (uint16_t)(arb_rsp.result & 0xFFFF);
+                               switch (decision) {
+                                   case 1:
+                                       log->log("Arbiter: PROMOTE.");
+                                       model_id = rec_model_id;
+                                       break;
+                                   case 2:
+                                       log->log("Arbiter: REJECT.");
+                                       model_id = rec_model_id;
+                                       break;
+                                   case 3:
+                                       log->log("Arbiter: SAFE_MODE.");
+                                       safemode = true;
+                                       model_id = rec_model_id;
+                                       break;
+                                   default:
+                                       log->log("Arbiter: HOLD.");
+                                       model_id = rec_model_id;
+                                       break;
+                               }
+                               /* Track chain head for continuity. */
+                               for (int i = 0; i < 32; i++)
+                                   g_last_chain_hash[i] = ifr.chain_hash[i];
                            } else if (arb_rsp.status != RSP_OK) {
                                log->log("Arbiter error.");
                            }
@@ -387,15 +409,19 @@ extern "C" void kmain64(uint32_t mb2_magic, uint32_t mb2_info_ptr) {
 
       /* Run Agent */
       int action = 0;
-      action = kernel_infer_action(obs_ptr, 4, model_id);
-      if (action < 0) {
-          if (use_stream && loop_count < 5)
-              log->log("Kernel infer failed. Falling back to WASM.");
-          action = wasm_run_agent(default_wasm, sizeof(default_wasm),
-                                  obs_ptr, 4, model_id);
+      if (safemode) {
+          action = 0;
+      } else {
+          action = kernel_infer_action(obs_ptr, 4, model_id);
           if (action < 0) {
-              log->log("WASM Error. Fallback...");
-              action = 0;
+              if (use_stream && loop_count < 5)
+                  log->log("Kernel infer failed. Falling back to WASM.");
+              action = wasm_run_agent(default_wasm, sizeof(default_wasm),
+                                      obs_ptr, 4, model_id);
+              if (action < 0) {
+                  log->log("WASM Error. Fallback...");
+                  action = 0;
+              }
           }
       }
       

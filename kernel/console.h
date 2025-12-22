@@ -9,6 +9,7 @@ void console_write(const char *str);
 void console_putc(char c);
 void console_cls(void);
 void print_hex32(uint32_t val);
+void print_hex64(uint64_t val);
 void print_uint(uint32_t val);
 
 #endif /* _CONSOLE_H */

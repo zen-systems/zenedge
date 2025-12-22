@@ -49,6 +49,7 @@ class GymHandler:
         self.obs = None
         self.bridge = bridge
         self.model_blob_id = 0
+        self.baseline_model_id = 0
         self.obs_pool_ids = []
         self.free_obs_ids = []
         self.in_flight = set()
@@ -81,6 +82,8 @@ class GymHandler:
         if self.model_blob_id:
             self.bridge.heap.free_blob(self.model_blob_id)
         self.model_blob_id = blob_id
+        if not self.baseline_model_id:
+            self.baseline_model_id = blob_id
         print(f"[GYM] Uploaded Model to Blob {self.model_blob_id}")
         return blob_id
 
@@ -194,21 +197,28 @@ class GymHandler:
 
         data = bridge.heap.read_blob_data(packet.payload_id)
         rec = parse_ifr_blob(data)
-        if not rec or not rec["hash_ok"]:
+        if not rec or not rec.get("hash_ok"):
             print("[GYM] ARB_EPISODE: invalid IFR")
             return RSP_ERROR, 0
 
         decision = query_next_profile(data, rec)
-        profile = decision.get("profile") if isinstance(decision, dict) else None
-        if profile:
-            weights = np.array(profile, dtype=np.float32)
-            new_id = self._set_model_weights(weights)
-            if new_id:
-                print(f"[GYM] ARB_EPISODE: set model blob {new_id}")
-                return RSP_OK, new_id
-            return RSP_ERROR, 0
+        decision_code = int(decision.get("decision_code", 0)) if isinstance(decision, dict) else 0
+        recommended_model_id = int(decision.get("recommended_model_id", self.model_blob_id or self.baseline_model_id or 0)) \
+            if isinstance(decision, dict) else (self.model_blob_id or 0)
+        reason = decision.get("reason") if isinstance(decision, dict) else ""
 
-        return RSP_OK, 0
+        if decision_code == 1:  # PROMOTE
+            if self.model_blob_id:
+                self.baseline_model_id = self.model_blob_id
+                recommended_model_id = self.model_blob_id
+        elif decision_code in (2, 3):  # REJECT or SAFE_MODE
+            if self.baseline_model_id:
+                self.model_blob_id = self.baseline_model_id
+                recommended_model_id = self.baseline_model_id
+
+        packed = ((decision_code & 0xFFFF) << 16) | (recommended_model_id & 0xFFFF)
+        print(f"[GYM] ARB_EPISODE decision={decision_code} model={recommended_model_id} reason={reason}")
+        return RSP_OK, packed
     def process_stream_step(self) -> bool:
         if not self.streaming:
             return False

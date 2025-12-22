@@ -222,16 +222,27 @@ ACT_ENTRY_FMT = '<IHHII'
 ACT_ENTRY_STRUCT = struct.Struct(ACT_ENTRY_FMT)
 ACT_ENTRY_SIZE = ACT_ENTRY_STRUCT.size  # 16 bytes
 
-# IFR record (136 bytes)
+# IFR records
 IFR_MAGIC = 0x30465249  # "IFR0"
-IFR_VERSION = 2
+IFR_VERSION_V2 = 2
+IFR_VERSION_V3 = 3
 IFR_PROFILE_MAX = 16
-# magic, version, flags, job_id, episode_id, model_id, record_size, ts_usec,
+
+# v2: magic, version, flags, job_id, episode_id, model_id, record_size, ts_usec,
 # goodput, profile_len, reserved, profile[16], hash[32]
-IFR_FMT = '<IHHIIIIQfHH16f32s'
-IFR_STRUCT = struct.Struct(IFR_FMT)
-IFR_SIZE = IFR_STRUCT.size
-IFR_HASH_OFFSET = IFR_SIZE - 32
+IFR_V2_FMT = '<IHHIIIIQfHH16f32s'
+IFR_V2_STRUCT = struct.Struct(IFR_V2_FMT)
+IFR_V2_SIZE = IFR_V2_STRUCT.size
+IFR_V2_HASH_OFFSET = IFR_V2_SIZE - 32
+
+# v3: magic, version, flags, record_size, job_id, episode_id, model_id,
+# ts_usec, goodput, nonce[32], model_digest[32], policy_digest[32],
+# flightrec_seal_hash[32], prev_chain_hash[32], ifr_hash[32], chain_hash[32],
+# sig_classical[64]
+IFR_V3_FMT = '<IHHI III Q f 32s32s32s32s32s32s32s64s'
+IFR_V3_STRUCT = struct.Struct(IFR_V3_FMT)
+IFR_V3_SIZE = IFR_V3_STRUCT.size
+IFR_V3_HASH_OFFSET = IFR_V3_SIZE - (32 + 32 + 64)
 
 # Telemetry snapshot
 TELEMETRY_FMT = '<Qfff'

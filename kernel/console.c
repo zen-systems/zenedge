@@ -91,6 +91,18 @@ void print_hex32(uint32_t val) {
   console_write(buf);
 }
 
+void print_hex64(uint64_t val) {
+  static const char hex[] = "0123456789ABCDEF";
+  char buf[19]; // "0x" + 16 chars + null
+  buf[0] = '0';
+  buf[1] = 'x';
+  for (int i = 0; i < 16; i++) {
+    buf[2 + i] = hex[(val >> (60 - i * 4)) & 0xF];
+  }
+  buf[18] = '\0';
+  console_write(buf);
+}
+
 static void console_scroll(void) {
   /* Move lines 1-24 up to 0-23 */
   for (int y = 0; y < VGA_HEIGHT - 1; y++) {

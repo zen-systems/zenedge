@@ -33,16 +33,15 @@ def query_next_profile(ifr_raw: bytes, ifr_record: Dict[str, Any]) -> Dict[str, 
         except Exception as exc:
             print(f"[ARBITER] request failed: {exc}")
 
-    profile_env = os.getenv("ZENEDGE_ARB_PROFILE", "").strip()
-    if profile_env:
+    decision_env = os.getenv("ZENEDGE_ARB_DECISION", "").strip()
+    if decision_env:
         try:
-            vals = [float(x) for x in profile_env.split(",") if x.strip()]
-            if vals:
-                return {"profile": vals}
+            code = int(decision_env)
+            return {"decision_code": code}
         except Exception as exc:
-            print(f"[ARBITER] invalid ZENEDGE_ARB_PROFILE: {exc}")
+            print(f"[ARBITER] invalid ZENEDGE_ARB_DECISION: {exc}")
 
-    return {"profile": None}
+    return {"decision_code": 0}
 
 
 def verify_ifr_archive(out_dir: str = "/tmp/zenedge_ifr") -> None:
