@@ -6,6 +6,7 @@
 #include "../console.h"
 #include "../time/time.h"
 #include "../include/string.h"
+#include "../lib/sha256.h"
 
 /* Ring buffer */
 static trace_event_t buf[TRACE_BUF_SIZE];
@@ -92,6 +93,29 @@ void seal_episode(episode_t *ep) {
     if (!ep)
         return;
     memset(ep->tpm_signature, 0, sizeof(ep->tpm_signature));
+}
+
+void flightrec_seal_hash(uint8_t out[32]) {
+    if (!out) {
+        return;
+    }
+
+    /* Hash ring metadata and entries in chronological order. */
+    sha256_ctx_t ctx;
+    sha256_init(&ctx);
+
+    /* Include head to capture wrap position. */
+    sha256_update(&ctx, (const uint8_t *)&head, sizeof(head));
+
+    uint32_t count = (head > TRACE_BUF_SIZE) ? TRACE_BUF_SIZE : head;
+    uint32_t start = (head > TRACE_BUF_SIZE) ? (head - TRACE_BUF_SIZE) : 0;
+
+    for (uint32_t i = 0; i < count; i++) {
+        trace_event_t *e = &buf[(start + i) & TRACE_BUF_MASK];
+        sha256_update(&ctx, (const uint8_t *)e, sizeof(*e));
+    }
+
+    sha256_final(&ctx, out);
 }
 
 trace_span_t flightrec_begin_span(trace_event_type_t start_type,

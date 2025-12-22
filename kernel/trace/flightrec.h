@@ -111,6 +111,8 @@ void flightrec_log(trace_event_type_t type, uint32_t job_id,
                    uint32_t step_id, uint32_t extra);
 
 void seal_episode(episode_t *ep);
+/* Compute a stable hash of the flight recorder buffer in chronological order. */
+void flightrec_seal_hash(uint8_t out[32]);
 
 /*
  * Paired event logging for duration tracking

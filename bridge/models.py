@@ -121,9 +121,12 @@ class ModelCache:
         return [p.stem for p in self.model_dir.glob("*.onnx")]
 
 
-class IdentityModel(nn.Module):
-    def forward(self, x):
-        return x
+if nn is not None:
+    class IdentityModel(nn.Module):
+        def forward(self, x):
+            return x
+else:
+    IdentityModel = None
 
 
 if __name__ == "__main__":
